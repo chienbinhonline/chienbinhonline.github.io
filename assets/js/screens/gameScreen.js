@@ -1,6 +1,6 @@
 /* ============================================================
    GAME SCREEN — Xử lý màn hình chơi
-   V2.2: Thêm focus ô đáp án khi dấu = hiện ra (desktop only)
+   V2.3: Focus ô đáp án khi dấu = hiện ra (mọi thiết bị)
    ============================================================ */
 
 /* ============ CHUẨN BỊ CÂU ĐẦU ============ */
@@ -205,16 +205,17 @@ function startAnswerPhase() {
   $('btnCheck').disabled = false;
   $('timerBar').classList.add('flash');
   
-  // ⭐ Focus vào ô đáp án để nhập ngay
-  // - Desktop: focus bình thường
-  // - Mobile: KHÔNG focus để tránh bàn phím ảo hiện lên (đã có numpad)
-  const input = $('answer');
-  if (input) {
-    const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
-    if (!isTouchDevice) {
+  // ⭐ Focus vào ô đáp án (mọi thiết bị) — dùng setTimeout cho chắc chắn
+  setTimeout(() => {
+    const input = $('answer');
+    if (input && !input.disabled) {
       input.focus();
+      if (input.setSelectionRange) {
+        const len = input.value.length;
+        input.setSelectionRange(len, len);
+      }
     }
-  }
+  }, 50);
   
   let answerTimeLeft = config.timeAnswer;
   $('timerFill').style.width = '100%';
