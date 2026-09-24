@@ -1,6 +1,6 @@
 /* ============================================================
    RESULT SCREEN — Bảng kết quả + Lưu lịch sử
-   V2: gửi thêm rows + displayTime cho BXH
+   V2.2: Nếu đang test mode (LÀM THỬ) → không lưu Sheet
    ============================================================ */
 
 function showResult() {
@@ -22,13 +22,19 @@ function showResult() {
   $('summaryText').textContent = `Tổng: ${score}/${totalQuestions}`;
   $('summaryPercent').textContent = `(${percent}%)`;
   
-  // ===== XÁC ĐỊNH MODE CÓ DÙNG ROWS/TIME =====
+  // ⭐ NẾU ĐANG TEST MODE → KHÔNG LƯU SHEET
+  if (isTestMode) {
+    console.log('🧪 Test mode — Không lưu vào Sheet');
+    goTo('screen-result');
+    return;
+  }
+  
+  // ===== LƯU LỊCH SỬ (chỉ khi không phải test mode) =====
   const isFMFlash = isFMFlashcardOnly(currentMode);
   const isSBFlash = (currentMode === 'sb-flash');
   const isMath = isMathMode(currentMode);
   const isCalculationMode = !isFMFlash && !isSBFlash && !isMath;
   
-  // ===== LƯU LỊCH SỬ =====
   addHistoryRecord({
     mode: currentMode,
     subject: currentMode.startsWith('fm') ? 'fingermath' : 'soroban',
@@ -47,6 +53,12 @@ function restartGame() {
   score = 0; wrong = 0; streak = 0;
   currentQuestionIndex = 0; history = [];
   reviewQueue = [];
+  
+  // ⭐ Nếu đang test mode → reset về totalQuestions = 1
+  if (isTestMode) {
+    totalQuestions = 1;
+  }
+  
   if (currentMode === 'fm-review' || currentMode === 'sb-add-review') buildReviewQueue();
   $('score').textContent = 0;
   $('streak').textContent = 0;
