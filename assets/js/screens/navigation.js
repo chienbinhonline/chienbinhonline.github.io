@@ -1,12 +1,52 @@
 /* ============================================================
    NAVIGATION — Chuyển màn hình + đổi kích thước app
-   V2: thêm app-chart + app-leaderboard
+   V2.1: Thêm hàm goBack() để lùi 1 trang
    ============================================================ */
 
+/* ============ HISTORY STACK ============ */
+let screenHistory = ['screen-home'];
+
 function goTo(screenId) {
+  const currentActive = document.querySelector('.screen.active');
+  const currentId = currentActive ? currentActive.id : '';
+  
+  // Chỉ push vào history nếu KHÁC màn hình hiện tại
+  if (currentId && currentId !== screenId) {
+    if (screenHistory[screenHistory.length - 1] !== currentId) {
+      screenHistory.push(currentId);
+    }
+  }
+  
+  // Đổi màn hình
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   $(screenId).classList.add('active');
   updateAppSize(screenId);
+}
+
+/* ⭐ HÀM MỚI: Lùi 1 trang */
+function goBack() {
+  // Dừng timer nếu đang chơi
+  if (typeof stopAllTimers === 'function') stopAllTimers();
+  
+  if (screenHistory.length <= 1) {
+    // Không còn gì để lùi → về home
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    $('screen-home').classList.add('active');
+    updateAppSize('screen-home');
+    screenHistory = ['screen-home'];
+    return;
+  }
+  
+  // Bỏ màn hình hiện tại khỏi history
+  screenHistory.pop();
+  
+  // Lấy màn hình trước đó
+  const prevScreen = screenHistory[screenHistory.length - 1] || 'screen-home';
+  
+  // Đổi màn hình (không push lại vào history)
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  $(prevScreen).classList.add('active');
+  updateAppSize(prevScreen);
 }
 
 function updateAppSize(screenId) {
@@ -37,11 +77,11 @@ function updateAppSize(screenId) {
 
 function backToMenu() {
   stopAllTimers();
-  goTo(lastMenuScreen);
+  goBack();
 }
 
 function backFromConfig() {
-  goTo(lastConfigScreen);
+  goBack();
 }
 
 function togglePastBox() {
