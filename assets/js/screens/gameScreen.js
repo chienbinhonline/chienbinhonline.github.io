@@ -1,6 +1,6 @@
 /* ============================================================
    GAME SCREEN — Xử lý màn hình chơi
-   V2: hỗ trợ numpad (bàn phím ảo)
+   V2.2: Thêm focus ô đáp án khi dấu = hiện ra (desktop only)
    ============================================================ */
 
 /* ============ CHUẨN BỊ CÂU ĐẦU ============ */
@@ -204,6 +204,17 @@ function startAnswerPhase() {
   $('answer').disabled = false;
   $('btnCheck').disabled = false;
   $('timerBar').classList.add('flash');
+  
+  // ⭐ Focus vào ô đáp án để nhập ngay
+  // - Desktop: focus bình thường
+  // - Mobile: KHÔNG focus để tránh bàn phím ảo hiện lên (đã có numpad)
+  const input = $('answer');
+  if (input) {
+    const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+    if (!isTouchDevice) {
+      input.focus();
+    }
+  }
   
   let answerTimeLeft = config.timeAnswer;
   $('timerFill').style.width = '100%';
