@@ -16,6 +16,7 @@ let overlayTimer = null;
 
 let lastMenuScreen = 'screen-home';
 let lastConfigScreen = 'screen-fingermath';
+let isTestMode = false;
 
 // ===== CẤU HÌNH =====
 let config = {
