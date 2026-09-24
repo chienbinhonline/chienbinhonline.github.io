@@ -1,6 +1,6 @@
 /* ============================================================
    CONFIG SCREEN — Xử lý màn hình cấu hình
-   Gộp Chữ số + Số hàng trên 1 hàng
+   V2.1: Nút LÀM THỬ chạy 1 câu test, không lưu Sheet
    ============================================================ */
 
 function renderDigitButtons(mode) {
@@ -87,15 +87,12 @@ function openConfig(mode) {
   const isMath = isMathMode(mode);
   
   if (isFMFlash) {
-    // FM Flashcard: ẩn hết
     $('digitSection').style.display = 'none';
     $('mathSection').style.display = 'none';
   } else if (isSBFlash) {
-    // SB Flashcard: hiện Chữ số, ẨN Số hàng
     $('digitSection').style.display = 'block';
     $('mathSection').style.display = 'none';
     
-    // Ẩn label + input "Số hàng"
     const termLabel = $('digitSection').querySelectorAll('.config-label')[1];
     if (termLabel) termLabel.style.display = 'none';
     $('termInput').style.display = 'none';
@@ -104,16 +101,13 @@ function openConfig(mode) {
     if (!options.includes(config.digits)) config.digits = options[0];
     renderDigitButtons(mode);
   } else if (isMath) {
-    // Nhân/Chia
     $('digitSection').style.display = 'none';
     $('mathSection').style.display = 'block';
     renderMathDigitButtons(mode);
   } else {
-    // Mode phép tính: hiện cả Chữ số + Số hàng
     $('digitSection').style.display = 'block';
     $('mathSection').style.display = 'none';
     
-    // Hiện label + input "Số hàng"
     const termLabel = $('digitSection').querySelectorAll('.config-label')[1];
     if (termLabel) termLabel.style.display = 'inline';
     $('termInput').style.display = 'inline-block';
@@ -131,21 +125,35 @@ function openConfig(mode) {
   goTo('screen-config');
 }
 
+/* ============================================================
+   START PRACTICE — save = true (LƯU) / false (LÀM THỬ)
+   V2.1: LÀM THỬ = 1 câu test, không lưu Sheet
+   ============================================================ */
 function startPractice(save) {
   const isFMFlash = isFMFlashcardOnly(currentMode);
   const isSBFlash = (currentMode === 'sb-flash');
   const isMath = isMathMode(currentMode);
   
+  // Đọc config từ UI
   if (!isFMFlash && !isSBFlash && !isMath) {
     config.terms = parseInt($('termInput').value) || 5;
   }
   config.pack = parseInt($('packSelect').value) || 10;
   
-  if (save) localStorage.setItem('superbrain_config_' + currentMode, JSON.stringify(config));
+  if (save) {
+    // LƯU: lưu config + chạy đủ số câu
+    localStorage.setItem('superbrain_config_' + currentMode, JSON.stringify(config));
+    totalQuestions = config.pack;
+    isTestMode = false;   // ⭐ Đánh dấu: KHÔNG phải test mode
+  } else {
+    // LÀM THỬ: 1 câu test, không lưu config
+    totalQuestions = 1;
+    isTestMode = true;    // ⭐ Đánh dấu: ĐANG TEST MODE
+  }
   
+  // Reset state
   score = 0; wrong = 0; streak = 0;
   currentQuestionIndex = 0;
-  totalQuestions = config.pack;
   history = [];
   reviewQueue = [];
   
