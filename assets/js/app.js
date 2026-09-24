@@ -1,5 +1,5 @@
 /* ============================================================
-   APP — Entry point + Login SĐT + Sync lịch sử + Numpad
+   APP — Entry point + Login (1 ô mã HV) + Sync + Numpad
    ============================================================ */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -53,6 +53,7 @@ function initEventListeners() {
     });
   }
   
+  // Ô nhập mã → Enter đăng nhập
   const phoneInput = $('studentPhoneInput');
   if (phoneInput) {
     phoneInput.addEventListener('keypress', e => {
@@ -69,7 +70,6 @@ function initNumpad() {
   const numpad = $('numpad');
   if (!numpad) return;
   
-  // Click button → nhập số
   numpad.addEventListener('click', e => {
     const btn = e.target.closest('.numpad-btn');
     if (!btn) return;
@@ -82,7 +82,6 @@ function initNumpad() {
     const action = btn.dataset.action;
     
     if (num !== undefined) {
-      // Giới hạn 10 ký tự
       if (input.value.length < 10) {
         input.value += num;
       }
@@ -93,14 +92,11 @@ function initNumpad() {
     }
   });
   
-  // Chặn bàn phím ảo mobile khi focus input
   const input = $('answer');
   if (input) {
     const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
-    
-    input.addEventListener('focus', e => {
+    input.addEventListener('focus', () => {
       if (isTouchDevice) {
-        // Trên mobile: blur ngay để không hiện bàn phím ảo
         setTimeout(() => input.blur(), 10);
       }
     });
@@ -112,7 +108,7 @@ function checkLoginStatus() {
   const overlay = $('nameOverlay');
   const phone = getStudentPhone();
   
-  if (phone && phone.length >= 9) {
+  if (phone && phone.length >= 3) {
     overlay.classList.add('hidden');
     overlay.style.display = 'none';
     updateStudentInfoUI();
@@ -126,7 +122,7 @@ function checkLoginStatus() {
   }
 }
 
-/* ============ ĐĂNG NHẬP ============ */
+/* ============ ĐĂNG NHẬP (1 Ô MÃ HV) ============ */
 function doLogin() {
   const phoneInput = $('studentPhoneInput');
   const errorEl = $('loginError');
@@ -134,9 +130,10 @@ function doLogin() {
   
   const phone = phoneInput ? phoneInput.value.trim().replace(/[\s\-\.]/g, '') : '';
   
-  if (!phone || phone.length < 9) {
-    errorEl.textContent = '⚠️ Vui lòng nhập SĐT hợp lệ (tối thiểu 9 số)';
+  if (!phone || phone.length < 3) {
+    errorEl.textContent = '⚠️ Vui lòng nhập mã đăng nhập';
     errorEl.style.display = 'block';
+    if (phoneInput) phoneInput.focus();
     return;
   }
   
@@ -162,7 +159,7 @@ function doLogin() {
     })
     .catch(err => {
       console.error('❌ Lỗi:', err);
-      errorEl.textContent = '❌ ' + (err.message || 'SĐT chưa được đăng ký');
+      errorEl.textContent = '❌ ' + (err.message || 'Mã chưa được đăng ký');
       errorEl.style.display = 'block';
     })
     .finally(() => {
