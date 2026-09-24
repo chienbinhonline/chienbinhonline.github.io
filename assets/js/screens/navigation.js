@@ -1,6 +1,6 @@
 /* ============================================================
    NAVIGATION — Chuyển màn hình + đổi kích thước app
-   V2.1: Thêm hàm goBack() để lùi 1 trang
+   V2.3: Fix goBack() để xử lý đúng khi history lệch
    ============================================================ */
 
 /* ============ HISTORY STACK ============ */
@@ -23,13 +23,22 @@ function goTo(screenId) {
   updateAppSize(screenId);
 }
 
-/* ⭐ HÀM MỚI: Lùi 1 trang */
+/* ⭐ HÀM goBack() ĐÃ SỬA */
 function goBack() {
   // Dừng timer nếu đang chơi
   if (typeof stopAllTimers === 'function') stopAllTimers();
   
+  // ⭐ Lấy màn hình đang active hiện tại
+  const currentActive = document.querySelector('.screen.active');
+  const currentId = currentActive ? currentActive.id : '';
+  
+  // ⭐ Nếu màn hình hiện tại CHƯA có trong history → thêm vào
+  if (currentId && screenHistory[screenHistory.length - 1] !== currentId) {
+    screenHistory.push(currentId);
+  }
+  
+  // ⭐ Nếu history chỉ có 1 phần tử → về home
   if (screenHistory.length <= 1) {
-    // Không còn gì để lùi → về home
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     $('screen-home').classList.add('active');
     updateAppSize('screen-home');
@@ -37,13 +46,13 @@ function goBack() {
     return;
   }
   
-  // Bỏ màn hình hiện tại khỏi history
+  // ⭐ Bỏ màn hình hiện tại
   screenHistory.pop();
   
   // Lấy màn hình trước đó
   const prevScreen = screenHistory[screenHistory.length - 1] || 'screen-home';
   
-  // Đổi màn hình (không push lại vào history)
+  // Đổi màn hình
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   $(prevScreen).classList.add('active');
   updateAppSize(prevScreen);
