@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
@@ -15,16 +15,21 @@
 </head>
 <body>
 
-<!-- ============ OVERLAY ĐĂNG NHẬP ============ -->
+<!-- ============ OVERLAY ĐĂNG NHẬP (1 Ô — MÃ HỌC VIÊN) ============ -->
 <div class="name-overlay" id="nameOverlay">
   <div class="name-modal">
     <h2>Chào mừng đến SUPERBRAIN!</h2>
     <p>Cú pháp đăng nhập</p>
-    <p>VD: Huỳnh Tấn Đạt - 18/12/2018 -> htd18122018</p>
+    
+    <p style="font-size:12px; color:#888; margin-bottom:16px; text-align:center;">
+      VD: Huỳnh Tấn Đạt - 18/12/2018 → htd18122018
+    </p>
     
     <div class="name-field">
       <label for="studentPhoneInput">Số điện thoại</label>
-      <input type="tel" id="studentPhoneInput" placeholder="VD: 0901234567" maxlength="30" autocomplete="off">
+      <input type="text" id="studentPhoneInput" placeholder="Nhập mã đăng nhập" 
+             maxlength="30" autocomplete="off" 
+             autocapitalize="off" autocorrect="off" spellcheck="false">
     </div>
     
     <div class="login-error" id="loginError"></div>
@@ -326,7 +331,7 @@
     </div>
     
     <h2 class="chart-title">🏆 Bảng xếp hạng</h2>
-    <p class="chart-subtitle" id="lbSubtitle">Xếp hạng theo tốc độ (số hàng / thời gian hiện phép)</p>
+    <p class="chart-subtitle" id="lbSubtitle">Top 50 học viên có tốc độ cao nhất (số hàng / thời gian)</p>
     
     <div class="lb-scroll">
       <table class="lb-table">
