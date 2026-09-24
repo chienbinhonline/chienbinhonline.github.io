@@ -1,0 +1,429 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="color-scheme" content="light">
+<title>SUPERBRAIN - FingerMath & Soroban</title>
+
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="stylesheet" href="assets/css/menu.css">
+<link rel="stylesheet" href="assets/css/config.css">
+<link rel="stylesheet" href="assets/css/game.css">
+<link rel="stylesheet" href="assets/css/flashcard.css">
+<link rel="stylesheet" href="assets/css/result.css">
+</head>
+<body>
+
+<!-- ============ OVERLAY ĐĂNG NHẬP ============ -->
+<div class="name-overlay" id="nameOverlay">
+  <div class="name-modal">
+    <h2>Chào mừng đến SUPERBRAIN!</h2>
+    <p>Cú pháp đăng nhập</p>
+    <p>VD: Huỳnh Tấn Đạt - 18/12/2018 -> htd18122018</p>
+    
+    <div class="name-field">
+      <label for="studentPhoneInput">Số điện thoại</label>
+      <input type="tel" id="studentPhoneInput" placeholder="VD: 0901234567" maxlength="30" autocomplete="off">
+    </div>
+    
+    <div class="login-error" id="loginError"></div>
+    
+    <button class="btn-start-name" id="btnLogin" onclick="doLogin()">ĐĂNG NHẬP</button>
+  </div>
+</div>
+
+<div class="app">
+  <button class="sound-toggle" id="soundToggle" onclick="toggleSound()" title="Bật/tắt âm thanh">🔊</button>
+  <button class="leaderboard-toggle" id="leaderboardToggle" onclick="showLeaderboard()" title="Bảng xếp hạng">🏆</button>
+  <button class="logout-toggle" id="logoutToggle" onclick="confirmLogout()" title="Thoát">🚪</button>
+
+  <div class="logo">
+    <img src="icon/logo.png" alt="SUPERBRAIN" class="logo-img"
+         onerror="this.parentElement.innerHTML='🧠 SUPERBRAIN'; this.parentElement.style.fontSize='28px'; this.parentElement.style.fontWeight='800';">
+  </div>
+  <div class="subtitle">FingerMath & Soroban</div>
+
+  <!-- ============ HOME ============ -->
+  <div class="screen active" id="screen-home">
+    <div class="menu-grid menu-grid-home">
+      <button class="menu-card" onclick="goTo('screen-fingermath')">
+        <div class="menu-card-main">
+          <div class="menu-icon">
+            <img src="icon/finger.png" alt="FingerMath" onerror="this.style.display='none'; this.parentElement.textContent='🖐️'; this.parentElement.style.fontSize='32px';">
+          </div>
+          <div>
+            <div class="menu-text">FingerMath</div>
+            <div class="menu-desc">Tính toán bằng ngón tay (≤ 99)</div>
+          </div>
+        </div>
+        <div class="menu-arrow">›</div>
+      </button>
+      
+      <button class="menu-card" onclick="goTo('screen-soroban')">
+        <div class="menu-card-main">
+          <div class="menu-icon">
+            <img src="icon/super.png" alt="Soroban" onerror="this.style.display='none'; this.parentElement.textContent='🧮'; this.parentElement.style.fontSize='32px';">
+          </div>
+          <div>
+            <div class="menu-text">Soroban</div>
+            <div class="menu-desc">Tính toán bằng bàn tính</div>
+          </div>
+        </div>
+        <div class="menu-arrow">›</div>
+      </button>
+      
+      <button class="menu-card" onclick="showResultChart()">
+        <div class="menu-card-main">
+          <div class="menu-icon" style="background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #fff; font-size: 26px;">📊</div>
+          <div>
+            <div class="menu-text">Kết quả</div>
+            <div class="menu-desc">Biểu đồ tiến độ học tập</div>
+          </div>
+        </div>
+        <div class="menu-arrow">›</div>
+      </button>
+    </div>
+    <div class="footer-credit">© Tòng</div>
+  </div>
+
+  <!-- ============ FINGERMATH MENU ============ -->
+  <div class="screen" id="screen-fingermath">
+    <button class="back-btn" onclick="goTo('screen-home')">‹ Trang chủ</button>
+    <div class="screen-title">🖐️ FingerMath</div>
+    <div class="screen-sub">Phạm vi: 0 – 99</div>
+    <div class="menu-scroll">
+      <div class="section-label">Flashcard</div>
+      <div class="menu-grid menu-grid-2col">
+        <button class="menu-card" onclick="openConfig('fm-flash-1')">
+          <div class="menu-card-main"><div class="menu-icon">✋</div><div><div class="menu-text">1 Tay</div><div class="menu-desc">Tay phải — 0 đến 9</div></div></div>
+          <div class="menu-arrow">›</div>
+        </button>
+        <button class="menu-card" onclick="openConfig('fm-flash-2')">
+          <div class="menu-card-main"><div class="menu-icon">🙌</div><div><div class="menu-text">2 Tay</div><div class="menu-desc">Cả hai tay — 0 đến 99</div></div></div>
+          <div class="menu-arrow">›</div>
+        </button>
+      </div>
+      <div class="section-label">Phép tính</div>
+      <div class="menu-grid menu-grid-2col">
+        <button class="menu-card" onclick="openConfig('fm-basic')">
+          <div class="menu-card-main"><div class="menu-icon">➕</div><div><div class="menu-text">Basic</div><div class="menu-desc">Không nhớ/mượn</div></div></div>
+          <div class="menu-arrow">›</div>
+        </button>
+        <button class="menu-card" onclick="openConfig('fm-lb-plus')">
+          <div class="menu-card-main"><div class="menu-icon">🟢</div><div><div class="menu-text">Little Buddy +</div><div class="menu-desc">+1..+4 qua 5</div></div></div>
+          <div class="menu-arrow">›</div>
+        </button>
+        <button class="menu-card" onclick="openConfig('fm-lb-minus')">
+          <div class="menu-card-main"><div class="menu-icon">🔴</div><div><div class="menu-text">Little Buddy −</div><div class="menu-desc">−1..−4 dưới 5</div></div></div>
+          <div class="menu-arrow">›</div>
+        </button>
+        <button class="menu-card" onclick="openConfig('fm-bb-plus')">
+          <div class="menu-card-main"><div class="menu-icon">🔵</div><div><div class="menu-text">Big Buddy +</div><div class="menu-desc">Có nhớ qua 10</div></div></div>
+          <div class="menu-arrow">›</div>
+        </button>
+        <button class="menu-card" onclick="openConfig('fm-bb-minus')">
+          <div class="menu-card-main"><div class="menu-icon">🟣</div><div><div class="menu-text">Big Buddy −</div><div class="menu-desc">Có mượn qua 10</div></div></div>
+          <div class="menu-arrow">›</div>
+        </button>
+        <button class="menu-card" onclick="openConfig('fm-review')">
+          <div class="menu-card-main"><div class="menu-icon">📚</div><div><div class="menu-text">Ôn tập</div><div class="menu-desc">Tổng hợp 5 dạng</div></div></div>
+          <div class="menu-arrow">›</div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SOROBAN MENU ============ -->
+  <div class="screen" id="screen-soroban">
+    <button class="back-btn" onclick="goTo('screen-home')">‹ Trang chủ</button>
+    <div class="screen-title">🧮 Soroban</div>
+    <div class="screen-sub">Số chữ số 1-8</div>
+    <div class="menu-scroll">
+      <div class="section-label">Flashcard</div>
+      <div class="menu-grid menu-grid-2col">
+        <button class="menu-card" onclick="openConfig('sb-flash')">
+          <div class="menu-card-main"><div class="menu-icon">🎴</div><div><div class="menu-text">Flashcard Soroban</div><div class="menu-desc">Bàn tính theo số</div></div></div>
+          <div class="menu-arrow">›</div>
+        </button>
+      </div>
+      <div class="section-label">Cộng trừ</div>
+      <div class="menu-grid menu-grid-2col">
+        <button class="menu-card" onclick="openConfig('sb-add-basic')">
+          <div class="menu-card-main"><div class="menu-icon">➕</div><div><div class="menu-text">Basic</div></div></div>
+          <div class="menu-arrow">›</div>
+        </button>
+        <button class="menu-card" onclick="openConfig('sb-add-lb-plus')">
+          <div class="menu-card-main"><div class="menu-icon">🟢</div><div><div class="menu-text">Little Buddy +</div></div></div>
+          <div class="menu-arrow">›</div>
+        </button>
+        <button class="menu-card" onclick="openConfig('sb-add-lb-minus')">
+          <div class="menu-card-main"><div class="menu-icon">🔴</div><div><div class="menu-text">Little Buddy −</div></div></div>
+          <div class="menu-arrow">›</div>
+        </button>
+        <button class="menu-card" onclick="openConfig('sb-add-bb-plus')">
+          <div class="menu-card-main"><div class="menu-icon">🔵</div><div><div class="menu-text">Big Buddy +</div></div></div>
+          <div class="menu-arrow">›</div>
+        </button>
+        <button class="menu-card" onclick="openConfig('sb-add-bb-minus')">
+          <div class="menu-card-main"><div class="menu-icon">🟣</div><div><div class="menu-text">Big Buddy −</div></div></div>
+          <div class="menu-arrow">›</div>
+        </button>
+        <button class="menu-card" onclick="openConfig('sb-add-review')">
+          <div class="menu-card-main"><div class="menu-icon">📚</div><div><div class="menu-text">Ôn tập cộng trừ</div></div></div>
+          <div class="menu-arrow">›</div>
+        </button>
+      </div>
+      <div class="section-label">Nhân chia</div>
+      <div class="menu-grid menu-grid-2col">
+        <button class="menu-card" onclick="openConfig('sb-mul')">
+          <div class="menu-card-main"><div class="menu-icon">✖️</div><div><div class="menu-text">Nhân</div><div class="menu-desc">Phép nhân Soroban</div></div></div>
+          <div class="menu-arrow">›</div>
+        </button>
+        <button class="menu-card" onclick="openConfig('sb-div')">
+          <div class="menu-card-main"><div class="menu-icon">➗</div><div><div class="menu-text">Chia</div><div class="menu-desc">Phép chia hết</div></div></div>
+          <div class="menu-arrow">›</div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ CONFIG ============ -->
+  <div class="screen" id="screen-config">
+    <button class="back-btn" onclick="backFromConfig()" style="color:#2d5016;margin-bottom:8px;">‹ Quay lại</button>
+    <div class="config-screen">
+      <div class="config-title" id="configTitle">Basic</div>
+      
+      <div class="config-grid">
+        <div class="config-section" id="digitSection">
+          <div class="config-section-title">Cấu hình</div>
+          <div class="config-row">
+            <div class="config-label">Chữ số</div>
+            <div class="digit-btns" id="digitBtns"></div>
+            <div class="config-label" id="termLabel" style="margin-left: 14px;">Số hàng</div>
+            <input type="number" class="term-input" id="termInput" value="5" min="3" max="30">
+          </div>
+        </div>
+        
+        <div class="config-section" id="mathSection" style="display:none;">
+          <div class="config-section-title" id="mathSectionTitle">Nhân</div>
+          <div class="math-config-row">
+            <div class="config-label">Chữ số</div>
+            <div class="digit-btns" id="mathDigit1Btns"></div>
+            <div class="math-symbol" id="mathSymbol">×</div>
+            <div class="digit-btns" id="mathDigit2Btns"></div>
+          </div>
+        </div>
+        
+        <div class="config-section">
+          <div class="config-section-title">Thời gian hiện phép</div>
+          <div class="time-btns" id="timeDisplayBtns">
+            <button class="time-btn" data-time="6" onclick="setTimeDisplay(6)">6s</button>
+            <button class="time-btn" data-time="10" onclick="setTimeDisplay(10)">10s</button>
+            <button class="time-btn active" data-time="15" onclick="setTimeDisplay(15)">15s</button>
+            <button class="time-btn" data-time="20" onclick="setTimeDisplay(20)">20s</button>
+          </div>
+        </div>
+        
+        <div class="config-section">
+          <div class="config-section-title">Thời gian nhập đáp án</div>
+          <div class="time-btns" id="timeAnswerBtns">
+            <button class="time-btn active" data-time="6" onclick="setTimeAnswer(6)">6s</button>
+            <button class="time-btn" data-time="10" onclick="setTimeAnswer(10)">10s</button>
+          </div>
+        </div>
+        
+        <div class="config-section">
+          <div class="config-section-title">Gói câu hỏi</div>
+          <div class="config-row">
+            <select class="time-btn active" id="packSelect" style="min-width:140px;">
+              <option value="5">5 câu</option>
+              <option value="10" selected>10 câu</option>
+              <option value="15">15 câu</option>
+              <option value="20">20 câu</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      
+      <div class="config-actions">
+        <button class="btn-yellow" onclick="startPractice(false)">LÀM THỬ</button>
+        <button class="btn-yellow" onclick="startPractice(true)">LƯU</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ GAME ============ -->
+  <div class="screen" id="screen-game">
+    <div class="game-header">
+      <div class="game-header-left">
+        <button class="back-btn" onclick="backToMenu()" style="margin:0;">‹ Quay lại</button>
+        <div class="level-tag" id="levelTag">FINGERMATH</div>
+      </div>
+      <div class="score-inline">
+        Đúng: <span class="score-num" id="score">0</span><span class="score-sep">/</span><span id="totalDisplay">10</span>
+        · Chuỗi: <span class="streak-num" id="streak">0</span>🔥
+      </div>
+    </div>
+    <div class="progress-info" id="progressInfo">Câu 1 / 10</div>
+    <div class="timer-bar" id="timerBar"><div class="timer-fill" id="timerFill"></div></div>
+    
+    <div class="game-body">
+      <div class="game-left">
+        <div class="question-box" id="questionBox">
+          <div class="main-display" id="mainDisplay">5</div>
+          <div class="loading-spinner" id="loadingSpinner">
+            <div class="spinner"></div>
+            <div class="loading-text">Đang sinh câu hỏi...</div>
+          </div>
+          <div class="start-overlay" id="startOverlay">
+            <div class="start-title">Sẵn sàng chưa?</div>
+            <button class="btn-start" onclick="startNow()">▶ BẮT ĐẦU</button>
+          </div>
+          <div class="answer-overlay" id="answerOverlay">
+            <img id="answerOverlayImg" src="" alt="">
+          </div>
+        </div>
+        <div class="past-wrapper">
+          <button class="btn-show-past" id="btnShowPast" onclick="togglePastBox()">HIỆN</button>
+          <div class="past-display" id="pastDisplay"></div>
+        </div>
+      </div>
+      
+      <div class="game-right">
+        <input type="text" class="answer-input" id="answer" placeholder="Nhập đáp án..." 
+               autocomplete="off" inputmode="none" disabled>
+        
+        <div class="numpad" id="numpad">
+          <button type="button" class="numpad-btn" data-num="1">1</button>
+          <button type="button" class="numpad-btn" data-num="2">2</button>
+          <button type="button" class="numpad-btn" data-num="3">3</button>
+          <button type="button" class="numpad-btn" data-num="4">4</button>
+          <button type="button" class="numpad-btn" data-num="5">5</button>
+          <button type="button" class="numpad-btn" data-num="6">6</button>
+          <button type="button" class="numpad-btn" data-num="7">7</button>
+          <button type="button" class="numpad-btn" data-num="8">8</button>
+          <button type="button" class="numpad-btn" data-num="9">9</button>
+          <button type="button" class="numpad-btn numpad-clear" data-action="clear">✕</button>
+          <button type="button" class="numpad-btn" data-num="0">0</button>
+          <button type="button" class="numpad-btn numpad-back" data-action="back">←</button>
+        </div>
+        
+        <div class="buttons">
+          <button class="btn btn-primary" id="btnCheck" disabled>Kiểm tra</button>
+          <button class="btn btn-secondary" id="btnSkip" disabled>Bỏ qua</button>
+        </div>
+        <div class="feedback" id="feedback"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ BXH ============ -->
+  <div class="screen" id="screen-leaderboard">
+    <div class="chart-header">
+      <button class="back-btn" onclick="goTo('screen-home')">‹ Trang chủ</button>
+      <button class="close-btn" onclick="goTo('screen-home')" style="margin-left: auto;">✕</button>
+    </div>
+    
+    <h2 class="chart-title">🏆 Bảng xếp hạng</h2>
+    <p class="chart-subtitle" id="lbSubtitle">Xếp hạng theo tốc độ (số hàng / thời gian hiện phép)</p>
+    
+    <div class="lb-scroll">
+      <table class="lb-table">
+        <thead>
+          <tr>
+            <th>STT</th>
+            <th>Họ tên</th>
+            <th>Lớp</th>
+            <th>Bài tập</th>
+            <th>Kết quả</th>
+            <th>Tốc độ</th>
+          </tr>
+        </thead>
+        <tbody id="lbBody">
+          <tr><td colspan="6" style="text-align:center;padding:24px;color:#888;">Đang tải...</td></tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <div class="chart-actions">
+      <button class="btn-yellow" onclick="showLeaderboard()">🔄 LÀM MỚI</button>
+    </div>
+  </div>
+
+  <!-- ============ CHART ============ -->
+  <div class="screen" id="screen-chart">
+    <div class="chart-header">
+      <button class="back-btn" onclick="goTo('screen-home')">‹ Trang chủ</button>
+      <button class="close-btn" onclick="goTo('screen-home')" style="margin-left: auto;">✕</button>
+    </div>
+    
+    <h2 class="chart-title">Kết quả</h2>
+    <p class="chart-subtitle" id="chartSubtitle">Kết quả bài tập cho học viên</p>
+    
+    <div class="chart-legend" id="chartLegend"></div>
+    
+    <div class="chart-container">
+      <canvas id="chartCanvas"></canvas>
+    </div>
+    
+    <div class="chart-actions">
+      <button class="btn-yellow" onclick="goTo('screen-home')">BÀI TẬP</button>
+    </div>
+  </div>
+
+  <!-- ============ RESULT ============ -->
+  <div class="screen" id="screen-result">
+    <div class="result-container">
+      <div class="result-header">
+        <button class="close-btn" onclick="backToMenu()">✕</button>
+      </div>
+      <div class="result-scroll">
+        <table class="result-table">
+          <thead>
+            <tr>
+              <th>TT</th>
+              <th>Câu hỏi</th>
+              <th>Trả lời</th>
+              <th>Đúng</th>
+              <th>Kết quả</th>
+            </tr>
+          </thead>
+          <tbody id="resultBody"></tbody>
+        </table>
+        <div class="result-summary">
+          <div class="result-summary-text" id="summaryText">Tổng: 0/0</div>
+          <div class="result-summary-percent" id="summaryPercent">(0%)</div>
+        </div>
+      </div>
+      <div class="result-actions">
+        <button class="btn btn-primary" onclick="restartGame()">Làm lại</button>
+        <button class="btn btn-secondary" onclick="backToMenu()">Về menu</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- JS -->
+<script src="assets/js/core/config.js"></script>
+<script src="assets/js/core/utils.js"></script>
+<script src="assets/js/core/rules.js"></script>
+<script src="assets/js/core/sound.js"></script>
+<script src="assets/js/core/history.js"></script>
+<script src="assets/js/core/generator.js"></script>
+
+<script src="assets/js/modes/fingermath.js"></script>
+<script src="assets/js/modes/soroban.js"></script>
+
+<script src="assets/js/screens/navigation.js"></script>
+<script src="assets/js/screens/configScreen.js"></script>
+<script src="assets/js/screens/gameScreen.js"></script>
+<script src="assets/js/screens/resultScreen.js"></script>
+<script src="assets/js/screens/chartScreen.js"></script>
+<script src="assets/js/screens/leaderboardScreen.js"></script>
+
+<script src="assets/js/app.js"></script>
+
+</body>
+</html>

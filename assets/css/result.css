@@ -1,0 +1,144 @@
+﻿/* ============================================================
+   RESULT CSS — Bảng kết quả
+   ============================================================ */
+
+.result-container {
+    background: #fff;
+}
+
+.result-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 18px;
+}
+
+.close-btn {
+    width: 48px;
+    height: 48px;
+    border: 2px solid #333;
+    background: #fff;
+    border-radius: 8px;
+    font-size: 22px;
+    font-weight: 900;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
+}
+
+    .close-btn:hover {
+        background: #f0f0f0;
+    }
+
+.result-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 16px;
+}
+
+    .result-table thead th {
+        text-align: left;
+        padding: 18px 12px;
+        font-weight: 700;
+        color: #333;
+        border-bottom: 2px solid #e0e0e0;
+        font-size: 16px;
+    }
+
+        .result-table thead th:nth-child(1) {
+            width: 50px;
+        }
+
+        .result-table thead th:nth-child(3) {
+            width: 100px;
+            text-align: right;
+        }
+
+        .result-table thead th:nth-child(4) {
+            width: 80px;
+            text-align: right;
+        }
+
+        .result-table thead th:nth-child(5) {
+            width: 80px;
+            text-align: center;
+        }
+
+    .result-table tbody td {
+        padding: 16px 12px;
+        border-bottom: 1px solid #f0f0f0;
+        color: #333;
+        font-size: 15px;
+    }
+
+        .result-table tbody td:nth-child(1) {
+            color: #666;
+        }
+
+        .result-table tbody td:nth-child(3) {
+            text-align: right;
+        }
+
+        .result-table tbody td:nth-child(4) {
+            text-align: right;
+        }
+
+        .result-table tbody td:nth-child(5) {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+.tick {
+    color: #22a745;
+}
+
+.cross {
+    color: #e63946;
+}
+
+.result-summary {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    padding: 22px 12px 0;
+    border-top: 2px solid #e0e0e0;
+    margin-top: 8px;
+}
+
+.result-summary-text {
+    font-size: 22px;
+    font-weight: 700;
+    color: #333;
+}
+
+.result-summary-percent {
+    font-size: 22px;
+    font-weight: 700;
+    color: #333;
+}
+
+.result-actions {
+    display: flex;
+    gap: 16px;
+    margin-top: 32px;
+}
+
+    .result-actions .btn {
+        padding: 20px;
+    }
+
+.result-scroll {
+    max-height: 560px;
+    overflow-y: auto;
+}
+
+    .result-scroll::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .result-scroll::-webkit-scrollbar-thumb {
+        background: #d0d5ee;
+        border-radius: 4px;
+    }

@@ -1,0 +1,209 @@
+﻿/* ============================================================
+   FLASHCARD CSS — FingerMath + Soroban
+   ============================================================ */
+
+/* ============ FLASHCARD FINGERMATH ============ */
+.question-box.flashcard {
+    background: linear-gradient(135deg, #6ab04c, #4a8b35);
+    padding: 50px 30px;
+    min-height: 450px;
+}
+
+    .question-box.flashcard .main-display {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        font-size: inherit;
+        letter-spacing: 0;
+        line-height: 1;
+        min-height: auto;
+    }
+
+    .question-box.flashcard img {
+        display: block;
+        user-select: none;
+        -webkit-user-drag: none;
+    }
+
+.hands-display {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    align-items: flex-end;
+    padding: 8px 0;
+}
+
+.hand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.hand-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    opacity: 0.9;
+}
+
+.hand-value {
+    font-size: 28px;
+    font-weight: 900;
+    color: #fff;
+    background: rgba(0,0,0,0.2);
+    border-radius: 10px;
+    padding: 4px 16px;
+    min-width: 56px;
+    text-align: center;
+}
+
+.fingers-row {
+    display: flex;
+    gap: 5px;
+    align-items: flex-end;
+    background: rgba(255,255,255,0.15);
+    padding: 12px;
+    border-radius: 18px;
+}
+
+.finger {
+    width: 26px;
+    height: 60px;
+    background: rgba(255,255,255,0.35);
+    border: 2px solid rgba(255,255,255,0.5);
+    border-radius: 13px;
+    transition: all 0.3s;
+}
+
+    .finger.active {
+        background: linear-gradient(180deg, #ffd93d, #f5c518);
+        border-color: #ff9f1c;
+        transform: translateY(-3px);
+    }
+
+    .finger.thumb {
+        height: 40px;
+        margin-right: 3px;
+    }
+
+/* ============ FLASHCARD SOROBAN ============ */
+.question-box.soroban-flash {
+    background: linear-gradient(135deg, #6ab04c, #4a8b35);
+    padding: 28px;
+    min-height: 450px;
+}
+
+.soroban-board-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    overflow-x: auto;
+    padding: 8px 0;
+}
+
+.soroban-board {
+    display: flex;
+    gap: 0;
+    align-items: center;
+    background: transparent;
+}
+
+.soroban-col {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 70px;
+    flex-shrink: 0;
+}
+
+.soroban-slot {
+    width: 70px;
+    height: 38px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .soroban-slot img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: block;
+        user-select: none;
+        -webkit-user-drag: none;
+    }
+
+    .soroban-slot.frame-slot {
+        height: 14px;
+        overflow: visible;
+    }
+
+        .soroban-slot.frame-slot img.khung-img {
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+            display: block;
+        }
+
+        .soroban-slot.frame-slot .dot-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 14px;
+            height: 14px;
+            object-fit: contain;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 768px) {
+    .soroban-col {
+        width: 50px;
+    }
+
+    .soroban-slot {
+        width: 50px;
+        height: 28px;
+    }
+
+        .soroban-slot.frame-slot {
+            height: 11px;
+        }
+
+            .soroban-slot.frame-slot .dot-overlay {
+                width: 11px;
+                height: 11px;
+            }
+}
+
+@media (max-width: 480px) {
+    .question-box.flashcard img {
+        max-height: 160px !important;
+    }
+
+    .soroban-col {
+        width: 36px;
+    }
+
+    .soroban-slot {
+        width: 36px;
+        height: 20px;
+    }
+
+        .soroban-slot.frame-slot {
+            height: 8px;
+        }
+
+            .soroban-slot.frame-slot .dot-overlay {
+                width: 8px;
+                height: 8px;
+            }
+}
