@@ -1,7 +1,7 @@
 /* ============================================================
    HISTORY — Login SĐT + Load lịch sử từ Sheet + Gửi điểm + BXH
    SĐT là ID duy nhất của học viên
-   V2: gửi thêm rows + displayTime, thêm fetchLeaderboard
+   V2.3: Test mode → lưu local, KHÔNG gửi Sheet
    ============================================================ */
 
 const HISTORY_KEY = 'superbrain_history';
@@ -27,22 +27,22 @@ function saveHistory(arr) {
 function addHistoryRecord(data) {
   data.phone = getStudentPhone();
   
+  // ⭐ LUÔN lưu vào localStorage (dù là test hay luyện tập)
   const list = getHistory();
   list.push(data);
   saveHistory(list);
   
+  // ⭐ CHỈ gửi lên Google Sheet khi KHÔNG phải test mode
+  if (typeof isTestMode !== 'undefined' && isTestMode) {
+    console.log('🧪 Test mode — Chỉ lưu local, KHÔNG gửi Sheet');
+    return;
+  }
+  
+  // Gửi lên Sheet
   sendToGoogleSheets(data);
 }
 
 /* ============ GỬI ĐIỂM LÊN SHEET ============ */
-function addHistoryRecord(data) {
-  data.phone = getStudentPhone();
-  const list = getHistory();
-  list.push(data);
-  saveHistory(list);
-  sendToGoogleSheets(data);
-}
-
 function sendToGoogleSheets(data) {
   if (!API_URL) return;
   
@@ -83,12 +83,10 @@ function loginWithPhone(phone) {
   .then(res => res.json())
   .then(data => {
     if (data.status === 'success') {
-      // Xóa dữ liệu cũ
       localStorage.removeItem('superbrain_student_name');
       localStorage.removeItem('superbrain_student_class');
       localStorage.removeItem('superbrain_history');
       
-      // Lưu thông tin mới — SĐT là ID
       localStorage.setItem('superbrain_phone', data.phone);
       localStorage.setItem('superbrain_student_name', data.name);
       localStorage.setItem('superbrain_student_class', data.className || '');
@@ -133,7 +131,6 @@ function syncHistoryFromServer() {
         return;
       }
       
-      // Merge với localStorage
       const local = getHistory();
       const merged = [...local];
       
@@ -151,7 +148,7 @@ function syncHistoryFromServer() {
     });
 }
 
-/* ============ LẤY BẢNG XẾP HẠNG (MỚI) ============ */
+/* ============ LẤY BẢNG XẾP HẠNG ============ */
 function fetchLeaderboardFromServer() {
   if (!API_URL) return Promise.resolve([]);
   
