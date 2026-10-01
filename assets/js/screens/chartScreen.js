@@ -1,12 +1,11 @@
 /* ============================================================
    CHART SCREEN — Biểu đồ 7 ngày gần nhất
-   Dữ liệu từ: localStorage (đã sync từ Sheet khi login)
+   V2.1: Bỏ record test mode khỏi biểu đồ
    ============================================================ */
 
 function showResultChart() {
   goTo('screen-chart');
   
-  // Khi mở biểu đồ → sync lại từ server (đảm bảo mới nhất)
   const phone = getStudentPhone();
   if (phone) {
     syncHistoryFromServer().then(() => {
@@ -39,7 +38,7 @@ function renderChart() {
   const chartW = W - P.left - P.right;
   const chartH = H - P.top - P.bottom;
   
-  // ⭐ LẤY 7 NGÀY GẦN NHẤT (thay vì 10)
+  // 7 ngày gần nhất
   const today = new Date();
   const days = [];
   for (let i = 6; i >= 0; i--) {
@@ -100,7 +99,6 @@ function renderChart() {
     ctx.fillText(day.label, x, P.top + chartH + 10);
   });
   
-  // Label trục X
   ctx.font = 'bold 12px Segoe UI';
   ctx.fillStyle = '#333';
   ctx.textAlign = 'center';
@@ -110,7 +108,6 @@ function renderChart() {
   // ===== DỮ LIỆU =====
   const history = getHistory();
   
-  // Lọc chỉ lấy 7 ngày gần nhất + bỏ Flashcard
   const cutoff = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
   const validHistory = history.filter(rec => {
     if (!rec.date) return false;
@@ -118,6 +115,7 @@ function renderChart() {
     if (recDate < cutoff) return false;
     const mode = String(rec.mode || '');
     if (mode.includes('Flash')) return false;
+    if (rec.isTest === true) return false;   // ⭐ Bỏ record test khỏi biểu đồ
     return true;
   });
   
@@ -180,7 +178,6 @@ function renderChart() {
   renderLegend(validHistory);
 }
 
-// Render legend
 function renderLegend(history) {
   const legendEl = $('chartLegend');
   if (!legendEl) return;
@@ -201,7 +198,6 @@ function renderLegend(history) {
   }).join('');
 }
 
-// Vẽ lại khi resize
 window.addEventListener('resize', () => {
   if ($('screen-chart').classList.contains('active')) {
     clearTimeout(window._chartResizeTimer);
