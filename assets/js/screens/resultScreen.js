@@ -1,6 +1,7 @@
 /* ============================================================
    RESULT SCREEN — Bảng kết quả + Lưu lịch sử
-   V2.2: Nếu đang test mode (LÀM THỬ) → không lưu Sheet
+   V2.3: Luôn lưu lịch sử (cả test mode), addHistoryRecord tự
+         quyết định có gửi Sheet hay không
    ============================================================ */
 
 function showResult() {
@@ -22,19 +23,14 @@ function showResult() {
   $('summaryText').textContent = `Tổng: ${score}/${totalQuestions}`;
   $('summaryPercent').textContent = `(${percent}%)`;
   
-  // ⭐ NẾU ĐANG TEST MODE → KHÔNG LƯU SHEET
-  if (isTestMode) {
-    console.log('🧪 Test mode — Không lưu vào Sheet');
-    goTo('screen-result');
-    return;
-  }
-  
-  // ===== LƯU LỊCH SỬ (chỉ khi không phải test mode) =====
+  // ===== XÁC ĐỊNH MODE =====
   const isFMFlash = isFMFlashcardOnly(currentMode);
   const isSBFlash = (currentMode === 'sb-flash');
   const isMath = isMathMode(currentMode);
   const isCalculationMode = !isFMFlash && !isSBFlash && !isMath;
   
+  // ⭐ LUÔN lưu lịch sử (cả test mode + luyện tập)
+  // Hàm addHistoryRecord sẽ tự quyết định có gửi Sheet hay không
   addHistoryRecord({
     mode: currentMode,
     subject: currentMode.startsWith('fm') ? 'fingermath' : 'soroban',
@@ -43,7 +39,8 @@ function showResult() {
     total: totalQuestions,
     rows: isCalculationMode ? config.terms : 0,
     displayTime: isCalculationMode ? config.timeDisplay : 0,
-    date: new Date().toISOString()
+    date: new Date().toISOString(),
+    isTest: isTestMode === true   // ⭐ Đánh dấu record test
   });
   
   goTo('screen-result');
@@ -54,7 +51,7 @@ function restartGame() {
   currentQuestionIndex = 0; history = [];
   reviewQueue = [];
   
-  // ⭐ Nếu đang test mode → reset về totalQuestions = 1
+  // ⭐ Nếu đang test mode → giữ totalQuestions = 1
   if (isTestMode) {
     totalQuestions = 1;
   }
