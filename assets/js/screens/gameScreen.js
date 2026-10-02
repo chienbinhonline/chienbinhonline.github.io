@@ -1,6 +1,6 @@
 /* ============================================================
    GAME SCREEN — Xử lý màn hình chơi
-   V2.5: Màu số theo quy tắc "giống số trước → đổi màu"
+   V2.6: Fix màu đỏ cho số giống liền trước + log verify
    ============================================================ */
 
 /* ============ CHUẨN BỊ CÂU ĐẦU ============ */
@@ -150,7 +150,6 @@ function nextQuestion() {
    - Số đầu tiên: TRẮNG
    - Số sau:
      + Nếu GIỐNG số liền trước → ĐỔI MÀU so với số trước
-       (trước trắng → đỏ, trước đỏ → trắng)
      + Nếu KHÁC số liền trước → TRẮNG
    ============================================================ */
 function displaySequence(parts) {
@@ -165,17 +164,17 @@ function displaySequence(parts) {
   const stepTime = (total * 1000) / parts.length;
   const PAUSE_AFTER_LAST = 3000;
   
-  // ⭐ BƯỚC 1: Tính màu cho từng số (chỉ số, không tính dấu)
-  // tokenColorMap[i] = 'white' | 'red' — chỉ có giá trị với token là số
+  // ⭐ BƯỚC 1: Tính màu cho từng SỐ (bỏ qua dấu)
   const tokenColorMap = {};
   let prevNumber = null;
   let prevColor = 'white';
   
   parts.forEach((tok, i) => {
     const trimmed = String(tok).trim();
+    // Chỉ coi là số nếu chuỗi toàn ký tự số (0-9)
     const isNumber = /^[0-9]+$/.test(trimmed);
     
-    if (!isNumber) return;   // dấu → không set màu
+    if (!isNumber) return;
     
     const num = parseInt(trimmed, 10);
     
@@ -183,10 +182,10 @@ function displaySequence(parts) {
       // Số đầu tiên → trắng
       tokenColorMap[i] = 'white';
     } else if (num === prevNumber) {
-      // Giống số trước → đổi màu
+      // Giống số liền trước → đảo màu
       tokenColorMap[i] = (prevColor === 'white') ? 'red' : 'white';
     } else {
-      // Khác số trước → trắng
+      // Khác → trắng
       tokenColorMap[i] = 'white';
     }
     
@@ -194,17 +193,25 @@ function displaySequence(parts) {
     prevColor = tokenColorMap[i];
   });
   
-  // ⭐ BƯỚC 2: Helper render token
+  // ⭐ LOG để debug (có thể xóa sau)
+  console.log('🎨 Màu token:', JSON.stringify(tokenColorMap));
+  console.log('📝 Parts:', JSON.stringify(parts));
+  
+  // ⭐ BƯỚC 2: Render
   function tokenHTML(text, idx) {
     const color = tokenColorMap[idx];
-    const cls = (color === 'red') ? 'token token-red' : 'token';
-    return `<span class="${cls}">${text}</span>`;
+    if (color === 'red') {
+      return `<span class="token token-red" style="color:#ff3b30;">${text}</span>`;
+    }
+    return `<span class="token">${text}</span>`;
   }
   
   function tokenPastHTML(text, idx) {
     const color = tokenColorMap[idx];
-    const cls = (color === 'red') ? 'token-past token-past-red' : 'token-past';
-    return `<span class="${cls}">${text}</span>`;
+    if (color === 'red') {
+      return `<span class="token-past token-past-red" style="color:#ff3b30;background:#ffe5e5;">${text}</span>`;
+    }
+    return `<span class="token-past">${text}</span>`;
   }
   
   // Hiển thị token đầu tiên
@@ -260,7 +267,6 @@ function startAnswerPhase() {
   $('btnCheck').disabled = false;
   $('timerBar').classList.add('flash');
   
-  // Focus vào ô đáp án (mọi thiết bị) — dùng setTimeout cho chắc chắn
   setTimeout(() => {
     const input = $('answer');
     if (input && !input.disabled) {
