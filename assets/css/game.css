@@ -1,6 +1,6 @@
 /* ============================================================
    GAME CSS — Landscape với numpad
-   V2.4: Thêm màu đỏ cho số ở vị trí chẵn
+   V2.6: Màu đỏ cho số giống liền trước (dùng !important)
    ============================================================ */
 
 .game-header {
@@ -83,20 +83,32 @@
 }
 .main-display .token { display: inline-block; }
 
-/* ⭐ Số ở vị trí chẵn (2, 4, 6...) — màu ĐỎ */
-.main-display .token.token-red {
-  color: #ff3b30;
-  text-shadow: 0 8px 24px rgba(255, 59, 48, 0.35);
-}
-
-.past-display .token-past.token-past-red {
-  background: #ffe5e5;
-  color: #ff3b30;
-}
-
-.question-box.answer-reveal .main-display .token.token-red {
+/* ============================================================
+   ⭐ MÀU ĐỎ — CHO SỐ GIỐNG SỐ LIỀN TRƯỚC
+   Dùng !important + selector mạnh để chắc chắn ăn
+   ============================================================ */
+.token-red,
+.main-display .token-red,
+.main-display span.token.token-red,
+.main-display .token.token-red,
+.question-box .main-display .token-red {
   color: #ff3b30 !important;
-  text-shadow: none;
+  text-shadow: 0 8px 24px rgba(255, 59, 48, 0.35) !important;
+}
+
+.past-display .token-past-red,
+.past-display span.token-past.token-past-red,
+.past-display .token-past.token-past-red {
+  background: #ffe5e5 !important;
+  color: #ff3b30 !important;
+}
+
+/* Khi reveal đáp án (nền trắng) — vẫn giữ màu đỏ */
+.question-box.answer-reveal .token-red,
+.question-box.answer-reveal .main-display .token-red,
+.question-box.answer-reveal .main-display span.token.token-red {
+  color: #ff3b30 !important;
+  text-shadow: none !important;
 }
 
 /* CHUYỂN NỀN KHI TRẢ LỜI */
@@ -110,12 +122,6 @@
 .question-box.flashcard.answer-reveal .main-display,
 .question-box.soroban-flash.answer-reveal .main-display {
   color: #333 !important;
-  text-shadow: none;
-}
-
-/* ⭐ Giữ màu đỏ cho token khi reveal (không bị đổi sang đen) */
-.question-box.answer-reveal .main-display .token.token-red {
-  color: #ff3b30 !important;
   text-shadow: none;
 }
 
@@ -239,12 +245,6 @@
   padding: 4px 10px;
   border-radius: 8px;
   font-size: 15px;
-}
-
-/* ⭐ Past token đỏ */
-.past-display .token-past.token-past-red {
-  background: #ffe5e5;
-  color: #ff3b30;
 }
 
 /* INPUT + NUMPAD */
