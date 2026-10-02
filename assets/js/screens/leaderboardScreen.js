@@ -1,15 +1,16 @@
 /* ============================================================
-   LEADERBOARD SCREEN — BXH v2.2
+   LEADERBOARD SCREEN — BXH v2.3
    ------------------------------------------------------------
    Công thức: Tốc độ = (SoHang / ThoiGian) × (PhanTram / 100)
    
-   Xếp hạng:
-     1. Tốc độ giảm dần
-     2. Nếu bằng → PhanTram giảm dần
-     3. Nếu vẫn bằng → SoHang giảm dần
-     4. Nếu vẫn bằng → Ngày giảm dần (mới hơn xếp trên)
+   Logic:
+     1. Tính speed cho mỗi record
+     2. Group theo học viên (name + className)
+     3. Mỗi học viên chỉ giữ 1 record có speed cao nhất
+     4. Sort giảm dần theo speed
+     5. Hiển thị top 10
    
-   Cột hiển thị: STT | Họ tên | Lớp | Bài tập | Kết quả | Đúng | Tốc độ
+   Cột: STT | Họ tên | Lớp | Bài tập | Kết quả | Đúng | Tốc độ
    ============================================================ */
 
 function showLeaderboard() {
@@ -35,15 +36,13 @@ function renderLeaderboard(list) {
     return;
   }
   
-  // ⭐ SẮP XẾP THEO CÔNG THỨC MỚI
-  const ranked = list
+  // ===== BƯỚC 1: Tính speed cho mỗi record =====
+  const withSpeed = list
     .filter(r => r.rows > 0 && r.displayTime > 0)
     .map(r => {
       const rows = Number(r.rows) || 0;
       const displayTime = Number(r.displayTime) || 0;
       const percent = Number(r.percent) || 0;
-      
-      // ⭐ CÔNG THỨC: Tốc độ = (SoHang / ThoiGian) × (PhanTram / 100)
       const speed = (rows / displayTime) * (percent / 100);
       
       return {
@@ -53,28 +52,61 @@ function renderLeaderboard(list) {
         percent: percent,
         speed: speed
       };
-    })
-    .sort((a, b) => {
-      // Ưu tiên 1: Tốc độ giảm dần
-      if (b.speed !== a.speed) return b.speed - a.speed;
-      // Ưu tiên 2: PhanTram giảm dần
-      if (b.percent !== a.percent) return b.percent - a.percent;
-      // Ưu tiên 3: SoHang giảm dần
-      if (b.rows !== a.rows) return b.rows - a.rows;
-      // Ưu tiên 4: Ngày mới hơn xếp trên
-      const dateA = new Date(a.date || 0).getTime();
-      const dateB = new Date(b.date || 0).getTime();
-      return dateB - dateA;
     });
+  
+  // ===== BƯỚC 2: Group theo học viên =====
+  // Key định danh: name + className (lowercase, trim)
+  const bestByStudent = {};
+  
+  withSpeed.forEach(r => {
+    const key = `${String(r.name || '').trim().toLowerCase()}||${String(r.className || '').trim().toLowerCase()}`;
+    
+    if (!bestByStudent[key]) {
+      bestByStudent[key] = r;
+      return;
+    }
+    
+    const current = bestByStudent[key];
+    
+    // So sánh: speed cao hơn thắng
+    if (r.speed > current.speed) {
+      bestByStudent[key] = r;
+    } else if (r.speed === current.speed) {
+      // Bằng speed → ưu tiên percent cao hơn
+      if (r.percent > current.percent) {
+        bestByStudent[key] = r;
+      } else if (r.percent === current.percent) {
+        // Bằng percent → ưu tiên rows cao hơn
+        if (r.rows > current.rows) {
+          bestByStudent[key] = r;
+        }
+      }
+    }
+  });
+  
+  // ===== BƯỚC 3: Chuyển thành array + sort =====
+  const ranked = Object.values(bestByStudent).sort((a, b) => {
+    // Ưu tiên 1: Tốc độ giảm dần
+    if (b.speed !== a.speed) return b.speed - a.speed;
+    // Ưu tiên 2: PhanTram giảm dần
+    if (b.percent !== a.percent) return b.percent - a.percent;
+    // Ưu tiên 3: SoHang giảm dần
+    if (b.rows !== a.rows) return b.rows - a.rows;
+    // Ưu tiên 4: Ngày mới hơn xếp trên
+    const dateA = new Date(a.date || 0).getTime();
+    const dateB = new Date(b.date || 0).getTime();
+    return dateB - dateA;
+  });
   
   if (ranked.length === 0) {
     tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:#888;">Chưa có dữ liệu xếp hạng</td></tr>';
     return;
   }
   
-  // Lấy top 50
-  const top = ranked.slice(0, 50);
+  // ===== BƯỚC 4: Lấy top 10 =====
+  const top = ranked.slice(0, 10);
   
+  // ===== BƯỚC 5: Render =====
   tbody.innerHTML = top.map((r, i) => {
     const rank = i + 1;
     let rowClass = '';
@@ -83,10 +115,10 @@ function renderLeaderboard(list) {
     else if (rank === 2) { rowClass = 'lb-row-top2'; medal = '<span class="lb-medal">🥈</span>'; }
     else if (rank === 3) { rowClass = 'lb-row-top3'; medal = '<span class="lb-medal">🥉</span>'; }
     
-    const speedStr = r.speed.toFixed(2);                    // VD: "3.00"
-    const result = `${r.rows}/${r.displayTime}s`;           // VD: "20/6s"
-    const modeDisplay = r.mode || '—';                      // VD: "[SP]Basic"
-    const percentStr = `${r.percent}%`;                     // VD: "90%"
+    const speedStr = r.speed.toFixed(2);
+    const result = `${r.rows}/${r.displayTime}s`;
+    const modeDisplay = r.mode || '—';
+    const percentStr = `${r.percent}%`;
     
     return `
       <tr class="${rowClass}">
@@ -104,11 +136,8 @@ function renderLeaderboard(list) {
   // ⭐ Cập nhật subtitle
   const subtitle = $('lbSubtitle');
   if (subtitle) {
-    if (ranked.length > 50) {
-      subtitle.textContent = `Top 50 trên tổng ${ranked.length} kết quả — Tốc độ = (Số hàng / Thời gian) × Độ chính xác`;
-    } else {
-      subtitle.textContent = `${ranked.length} kết quả — Tốc độ = (Số hàng / Thời gian) × Độ chính xác`;
-    }
+    const totalStudents = ranked.length;
+    subtitle.textContent = `Top 10 trên tổng ${totalStudents} học viên — Tốc độ = (Số hàng / Thời gian) × Độ chính xác`;
   }
 }
 
