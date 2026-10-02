@@ -1,6 +1,6 @@
 /* ============================================================
    GAME SCREEN — Xử lý màn hình chơi
-   V2.4: Số ở vị trí chẵn (2, 4, 6...) hiển thị màu ĐỎ
+   V2.5: Màu số theo quy tắc "giống số trước → đổi màu"
    ============================================================ */
 
 /* ============ CHUẨN BỊ CÂU ĐẦU ============ */
@@ -145,7 +145,13 @@ function nextQuestion() {
 }
 
 /* ============================================================
-   HIỂN THỊ TUẦN TỰ — Số vị trí chẵn (2,4,6...) màu ĐỎ
+   HIỂN THỊ TUẦN TỰ
+   ⭐ Quy tắc màu:
+   - Số đầu tiên: TRẮNG
+   - Số sau:
+     + Nếu GIỐNG số liền trước → ĐỔI MÀU so với số trước
+       (trước trắng → đỏ, trước đỏ → trắng)
+     + Nếu KHÁC số liền trước → TRẮNG
    ============================================================ */
 function displaySequence(parts) {
   const mainEl = $('mainDisplay');
@@ -159,20 +165,49 @@ function displaySequence(parts) {
   const stepTime = (total * 1000) / parts.length;
   const PAUSE_AFTER_LAST = 3000;
   
-  // ⭐ Hàm tạo HTML cho token — idx lẻ (1,3,5...) = số ở vị trí 2,4,6... → đỏ
+  // ⭐ BƯỚC 1: Tính màu cho từng số (chỉ số, không tính dấu)
+  // tokenColorMap[i] = 'white' | 'red' — chỉ có giá trị với token là số
+  const tokenColorMap = {};
+  let prevNumber = null;
+  let prevColor = 'white';
+  
+  parts.forEach((tok, i) => {
+    const trimmed = String(tok).trim();
+    const isNumber = /^[0-9]+$/.test(trimmed);
+    
+    if (!isNumber) return;   // dấu → không set màu
+    
+    const num = parseInt(trimmed, 10);
+    
+    if (prevNumber === null) {
+      // Số đầu tiên → trắng
+      tokenColorMap[i] = 'white';
+    } else if (num === prevNumber) {
+      // Giống số trước → đổi màu
+      tokenColorMap[i] = (prevColor === 'white') ? 'red' : 'white';
+    } else {
+      // Khác số trước → trắng
+      tokenColorMap[i] = 'white';
+    }
+    
+    prevNumber = num;
+    prevColor = tokenColorMap[i];
+  });
+  
+  // ⭐ BƯỚC 2: Helper render token
   function tokenHTML(text, idx) {
-    const isEven = (idx % 2 === 1);
-    const cls = isEven ? 'token token-red' : 'token';
+    const color = tokenColorMap[idx];
+    const cls = (color === 'red') ? 'token token-red' : 'token';
     return `<span class="${cls}">${text}</span>`;
   }
   
   function tokenPastHTML(text, idx) {
-    const isEven = (idx % 2 === 1);
-    const cls = isEven ? 'token-past token-past-red' : 'token-past';
+    const color = tokenColorMap[idx];
+    const cls = (color === 'red') ? 'token-past token-past-red' : 'token-past';
     return `<span class="${cls}">${text}</span>`;
   }
   
-  // Hiển thị token đầu tiên (index 0)
+  // Hiển thị token đầu tiên
   mainEl.innerHTML = tokenHTML(parts[0], 0);
   let currentIdx = 1;
   
@@ -185,12 +220,10 @@ function displaySequence(parts) {
     $('timerFill').style.width = (remain / (total * 1000) * 100) + '%';
     
     if (currentIdx < parts.length && elapsed >= currentIdx * stepTime) {
-      // Push token cũ vào past (giữ đúng index để màu không đổi)
       const pastIdx = currentIdx - 1;
       pastTokens.push({ text: parts[pastIdx], idx: pastIdx });
       pastEl.innerHTML = pastTokens.map(t => tokenPastHTML(t.text, t.idx)).join('');
       
-      // Hiện token mới với index tương ứng
       mainEl.innerHTML = tokenHTML(parts[currentIdx], currentIdx);
       currentIdx++;
     }
@@ -227,7 +260,7 @@ function startAnswerPhase() {
   $('btnCheck').disabled = false;
   $('timerBar').classList.add('flash');
   
-  // ⭐ Focus vào ô đáp án (mọi thiết bị) — dùng setTimeout cho chắc chắn
+  // Focus vào ô đáp án (mọi thiết bị) — dùng setTimeout cho chắc chắn
   setTimeout(() => {
     const input = $('answer');
     if (input && !input.disabled) {
