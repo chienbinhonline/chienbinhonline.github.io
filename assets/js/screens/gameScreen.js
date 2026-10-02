@@ -164,28 +164,33 @@ function displaySequence(parts) {
   const stepTime = (total * 1000) / parts.length;
   const PAUSE_AFTER_LAST = 3000;
   
-  // ⭐ BƯỚC 1: Tính màu cho từng SỐ (bỏ qua dấu)
+  // ============================================================
+  // ⭐ BƯỚC 1: TÍNH MÀU CHO TỪNG SỐ (bỏ qua dấu)
+  // ============================================================
   const tokenColorMap = {};
   let prevNumber = null;
   let prevColor = 'white';
   
+  // LOG: bắt đầu
+  console.log('═══════ START displaySequence ═══════');
+  console.log('📝 Parts gốc:', JSON.stringify(parts));
+  
   parts.forEach((tok, i) => {
-    const trimmed = String(tok).trim();
-    // Chỉ coi là số nếu chuỗi toàn ký tự số (0-9)
+    const rawStr = String(tok);
+    const trimmed = rawStr.trim();
     const isNumber = /^[0-9]+$/.test(trimmed);
+    
+    console.log(`  [${i}] raw="${rawStr}" trim="${trimmed}" isNum=${isNumber}`);
     
     if (!isNumber) return;
     
     const num = parseInt(trimmed, 10);
     
     if (prevNumber === null) {
-      // Số đầu tiên → trắng
       tokenColorMap[i] = 'white';
     } else if (num === prevNumber) {
-      // Giống số liền trước → đảo màu
       tokenColorMap[i] = (prevColor === 'white') ? 'red' : 'white';
     } else {
-      // Khác → trắng
       tokenColorMap[i] = 'white';
     }
     
@@ -193,15 +198,16 @@ function displaySequence(parts) {
     prevColor = tokenColorMap[i];
   });
   
-  // ⭐ LOG để debug (có thể xóa sau)
-  console.log('🎨 Màu token:', JSON.stringify(tokenColorMap));
-  console.log('📝 Parts:', JSON.stringify(parts));
+  console.log('🎨 Màu token FINAL:', JSON.stringify(tokenColorMap));
+  console.log('═══════ END displaySequence ═══════');
   
-  // ⭐ BƯỚC 2: Render
+  // ============================================================
+  // ⭐ BƯỚC 2: RENDER
+  // ============================================================
   function tokenHTML(text, idx) {
     const color = tokenColorMap[idx];
     if (color === 'red') {
-      return `<span class="token token-red" style="color:#ff3b30;">${text}</span>`;
+      return `<span class="token token-red" style="color:#ff3b30 !important;">${text}</span>`;
     }
     return `<span class="token">${text}</span>`;
   }
@@ -209,12 +215,11 @@ function displaySequence(parts) {
   function tokenPastHTML(text, idx) {
     const color = tokenColorMap[idx];
     if (color === 'red') {
-      return `<span class="token-past token-past-red" style="color:#ff3b30;background:#ffe5e5;">${text}</span>`;
+      return `<span class="token-past token-past-red" style="color:#ff3b30 !important;background:#ffe5e5 !important;">${text}</span>`;
     }
     return `<span class="token-past">${text}</span>`;
   }
   
-  // Hiển thị token đầu tiên
   mainEl.innerHTML = tokenHTML(parts[0], 0);
   let currentIdx = 1;
   
