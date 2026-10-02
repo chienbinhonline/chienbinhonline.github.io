@@ -1,6 +1,6 @@
 /* ============================================================
    GAME SCREEN — Xử lý màn hình chơi
-   V2.3: Focus ô đáp án khi dấu = hiện ra (mọi thiết bị)
+   V2.4: Số ở vị trí chẵn (2, 4, 6...) hiển thị màu ĐỎ
    ============================================================ */
 
 /* ============ CHUẨN BỊ CÂU ĐẦU ============ */
@@ -144,7 +144,9 @@ function nextQuestion() {
   }, 50);
 }
 
-/* ============ HIỂN THỊ TUẦN TỰ ============ */
+/* ============================================================
+   HIỂN THỊ TUẦN TỰ — Số vị trí chẵn (2,4,6...) màu ĐỎ
+   ============================================================ */
 function displaySequence(parts) {
   const mainEl = $('mainDisplay');
   const pastEl = $('pastDisplay');
@@ -157,7 +159,21 @@ function displaySequence(parts) {
   const stepTime = (total * 1000) / parts.length;
   const PAUSE_AFTER_LAST = 3000;
   
-  mainEl.innerHTML = `<span class="token">${parts[0]}</span>`;
+  // ⭐ Hàm tạo HTML cho token — idx lẻ (1,3,5...) = số ở vị trí 2,4,6... → đỏ
+  function tokenHTML(text, idx) {
+    const isEven = (idx % 2 === 1);
+    const cls = isEven ? 'token token-red' : 'token';
+    return `<span class="${cls}">${text}</span>`;
+  }
+  
+  function tokenPastHTML(text, idx) {
+    const isEven = (idx % 2 === 1);
+    const cls = isEven ? 'token-past token-past-red' : 'token-past';
+    return `<span class="${cls}">${text}</span>`;
+  }
+  
+  // Hiển thị token đầu tiên (index 0)
+  mainEl.innerHTML = tokenHTML(parts[0], 0);
   let currentIdx = 1;
   
   let elapsed = 0;
@@ -169,10 +185,13 @@ function displaySequence(parts) {
     $('timerFill').style.width = (remain / (total * 1000) * 100) + '%';
     
     if (currentIdx < parts.length && elapsed >= currentIdx * stepTime) {
-      pastTokens.push(parts[currentIdx - 1]);
-      pastEl.innerHTML = pastTokens.map(t => `<span class="token-past">${t}</span>`).join('');
+      // Push token cũ vào past (giữ đúng index để màu không đổi)
+      const pastIdx = currentIdx - 1;
+      pastTokens.push({ text: parts[pastIdx], idx: pastIdx });
+      pastEl.innerHTML = pastTokens.map(t => tokenPastHTML(t.text, t.idx)).join('');
       
-      mainEl.innerHTML = `<span class="token">${parts[currentIdx]}</span>`;
+      // Hiện token mới với index tương ứng
+      mainEl.innerHTML = tokenHTML(parts[currentIdx], currentIdx);
       currentIdx++;
     }
     
@@ -180,12 +199,15 @@ function displaySequence(parts) {
       clearInterval(displayTimer);
       displayTimer = null;
       
+      let lastIdx;
       if (currentIdx === parts.length) {
-        pastTokens.push(parts[parts.length - 1]);
+        lastIdx = parts.length - 1;
+        pastTokens.push({ text: parts[lastIdx], idx: lastIdx });
       } else {
-        pastTokens.push(parts[currentIdx - 1]);
+        lastIdx = currentIdx - 1;
+        pastTokens.push({ text: parts[lastIdx], idx: lastIdx });
       }
-      pastEl.innerHTML = pastTokens.map(t => `<span class="token-past">${t}</span>`).join('');
+      pastEl.innerHTML = pastTokens.map(t => tokenPastHTML(t.text, t.idx)).join('');
       
       mainEl.innerHTML = '';
       
