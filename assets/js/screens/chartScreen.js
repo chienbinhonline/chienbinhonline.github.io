@@ -1,6 +1,6 @@
 /* ============================================================
    CHART SCREEN — Biểu đồ 7 ngày gần nhất
-   V2.1: Bỏ record test mode khỏi biểu đồ
+   V2.2: Nối toàn bộ điểm theo thời gian bằng đường cam
    ============================================================ */
 
 function showResultChart() {
@@ -115,7 +115,7 @@ function renderChart() {
     if (recDate < cutoff) return false;
     const mode = String(rec.mode || '');
     if (mode.includes('Flash')) return false;
-    if (rec.isTest === true) return false;   // ⭐ Bỏ record test khỏi biểu đồ
+    if (rec.isTest === true) return false;
     return true;
   });
   
@@ -146,7 +146,9 @@ function renderChart() {
     grouped[groupKey].values.push(rec.percent);
   });
   
-  // Vẽ điểm
+  // ===== CHUẨN BỊ MẢNG ĐIỂM ĐỂ VẼ =====
+  const allPoints = [];
+  
   Object.values(grouped).forEach(group => {
     const dayIdx = days.findIndex(d => d.key === group.dayKey);
     if (dayIdx < 0) return;
@@ -155,24 +157,58 @@ function renderChart() {
     const avg = Math.round(group.values.reduce((a,b) => a + b, 0) / group.values.length);
     const y = P.top + chartH - (avg / 100) * chartH;
     
-    const color = getModeColor(group.mode);
-    const symbol = getModeSymbol(group.mode);
-    
+    allPoints.push({
+      x, y, avg, dayIdx,
+      mode: group.mode,
+      color: getModeColor(group.mode),
+      symbol: getModeSymbol(group.mode)
+    });
+  });
+  
+  // ⭐ Sort tất cả điểm theo thời gian (dayIdx tăng dần)
+  allPoints.sort((a, b) => {
+    if (a.dayIdx !== b.dayIdx) return a.dayIdx - b.dayIdx;
+    return 0; // cùng ngày thì giữ nguyên thứ tự
+  });
+  
+  // ⭐ VẼ ĐƯỜNG NỐI TẤT CẢ ĐIỂM — MÀU CAM
+  if (allPoints.length >= 2) {
     ctx.beginPath();
-    ctx.arc(x, y, 11, 0, Math.PI * 2);
+    ctx.moveTo(allPoints[0].x, allPoints[0].y);
+    
+    for (let k = 1; k < allPoints.length; k++) {
+      ctx.lineTo(allPoints[k].x, allPoints[k].y);
+    }
+    
+    ctx.strokeStyle = '#FF8C00';    // ⭐ Cam đậm (DarkOrange)
+    ctx.lineWidth = 2.5;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.globalAlpha = 0.65;         // Mờ 65% để không đè chấm
+    ctx.stroke();
+    ctx.globalAlpha = 1.0;
+  }
+  
+  // ===== VẼ CÁC ĐIỂM (chấm + % + symbol) =====
+  allPoints.forEach(p => {
+    // Vẽ chấm trắng
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 11, 0, Math.PI * 2);
     ctx.fillStyle = 'rgba(255,255,255,0.9)';
     ctx.fill();
     
+    // Vẽ symbol màu theo mode
     ctx.font = 'bold 20px Segoe UI';
-    ctx.fillStyle = color;
+    ctx.fillStyle = p.color;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(symbol, x, y);
+    ctx.fillText(p.symbol, p.x, p.y);
     
+    // Vẽ % phía trên
     ctx.font = 'bold 10px Segoe UI';
-    ctx.fillStyle = color;
+    ctx.fillStyle = p.color;
     ctx.textBaseline = 'bottom';
-    ctx.fillText(avg + '%', x, y - 14);
+    ctx.fillText(p.avg + '%', p.x, p.y - 14);
   });
   
   renderLegend(validHistory);
