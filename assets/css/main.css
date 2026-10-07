@@ -54,6 +54,7 @@ body {
 .app.app-result      { max-width: 900px;  padding: 20px 28px; }
 .app.app-chart       { max-width: 1100px; padding: 20px 28px; }
 .app.app-leaderboard { max-width: 1000px; padding: 20px 28px; }
+.app.app-event       { max-width: 1000px; padding: 20px 28px; }
 
 /* LOGO */
 .logo {
