@@ -63,6 +63,9 @@ function initEventListeners() {
   
   const btnLeaderboard = $('leaderboardToggle');
   if (btnLeaderboard) btnLeaderboard.addEventListener('click', showLeaderboard);
+     // Nút sự kiện
+  const btnEvent = $('eventToggle');
+  if (btnEvent) btnEvent.addEventListener('click', () => showEvent());
 }
 
 /* ============ BÀN PHÍM ẢO (NUMPAD) ============ */
