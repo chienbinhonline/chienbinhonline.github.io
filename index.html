@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="assets/css/game.css">
 <link rel="stylesheet" href="assets/css/flashcard.css">
 <link rel="stylesheet" href="assets/css/result.css">
+<link rel="stylesheet" href="assets/css/event.css">
 </head>
 <body>
 
@@ -40,6 +41,7 @@
 
 <div class="app">
   <button class="sound-toggle" id="soundToggle" onclick="toggleSound()" title="Bật/tắt âm thanh">🔊</button>
+  <button class="event-toggle" id="eventToggle" onclick="showEvent()" title="Sự kiện">🔥</button>
   <button class="leaderboard-toggle" id="leaderboardToggle" onclick="showLeaderboard()" title="Bảng xếp hạng">🏆</button>
   <button class="logout-toggle" id="logoutToggle" onclick="confirmLogout()" title="Thoát">🚪</button>
 
@@ -322,7 +324,43 @@
       </div>
     </div>
   </div>
-
+  <!-- ============ SỰ KIỆN ============ -->
+  <div class="screen" id="screen-event">
+    <div class="chart-header">
+      <button class="back-btn" onclick="goBack()">‹ Trở về</button>
+      <button class="close-btn" onclick="goBack()" style="margin-left: auto;">✕</button>
+    </div>
+    
+    <div class="event-header" id="eventHeader">
+      <div class="event-icon" id="eventIcon">🔥</div>
+      <div class="event-title-group">
+        <div class="event-name" id="eventName">STREAK CHALLENGE</div>
+        <div class="event-tagline" id="eventTagline">Luyện tập mỗi ngày - Xây chuỗi bất tận</div>
+      </div>
+    </div>
+    
+    <p class="chart-subtitle" id="eventSubtitle">Đang tải...</p>
+    
+    <div class="event-scroll">
+      <table class="event-table">
+        <thead>
+          <tr id="eventTheadRow">
+            <th>STT</th>
+            <th>Học viên</th>
+            <th>Lớp</th>
+            <th style="text-align:right;">Chuỗi</th>
+          </tr>
+        </thead>
+        <tbody id="eventBody">
+          <tr><td colspan="4" style="text-align:center;padding:24px;color:#888;">Đang tải...</td></tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <div class="chart-actions">
+      <button class="btn-yellow" onclick="showEvent()">🔄 LÀM MỚI</button>
+    </div>
+  </div>
   <!-- ============ BXH ============ -->
   <div class="screen" id="screen-leaderboard">
     <div class="chart-header">
@@ -418,6 +456,7 @@
 <script src="assets/js/core/sound.js"></script>
 <script src="assets/js/core/history.js"></script>
 <script src="assets/js/core/generator.js"></script>
+<script src="assets/js/core/eventConfig.js"></script> 
 
 <script src="assets/js/modes/fingermath.js"></script>
 <script src="assets/js/modes/soroban.js"></script>
@@ -428,6 +467,7 @@
 <script src="assets/js/screens/resultScreen.js"></script>
 <script src="assets/js/screens/chartScreen.js"></script>
 <script src="assets/js/screens/leaderboardScreen.js"></script>
+<script src="assets/js/screens/eventScreen.js"></script>
 
 <script src="assets/js/app.js"></script>
 
