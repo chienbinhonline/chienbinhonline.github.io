@@ -1,1 +1,203 @@
+/* ============================================================
+   EVENT CSS — Màn hình sự kiện
+   ============================================================ */
 
+/* ===== HEADER SỰ KIỆN (LOGO + TÊN) ===== */
+.event-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  color: #fff;
+  margin-bottom: 12px;
+  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.35);
+}
+
+.event-icon {
+  font-size: 44px;
+  line-height: 1;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+.event-title-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.event-name {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.event-tagline {
+  font-size: 12px;
+  opacity: 0.95;
+  margin-top: 2px;
+  font-weight: 600;
+}
+
+/* ===== TABLE SỰ KIỆN ===== */
+.event-scroll {
+  max-height: 520px;
+  overflow-y: auto;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+}
+
+.event-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.event-table thead th {
+  position: sticky;
+  top: 0;
+  background: linear-gradient(180deg, #fef3c7, #fde68a);
+  text-align: left;
+  padding: 14px 12px;
+  font-weight: 700;
+  color: #78350f;
+  border-bottom: 2px solid #f59e0b;
+  font-size: 14px;
+  z-index: 5;
+}
+
+.event-table tbody td {
+  padding: 14px 12px;
+  border-bottom: 1px solid #f0f0f0;
+  color: #333;
+  font-size: 14px;
+}
+
+.event-table tbody tr:hover {
+  background: #fffbeb;
+}
+
+/* Cột STT */
+.event-table tbody td:nth-child(1) {
+  font-weight: 700;
+  color: #666;
+  font-size: 16px;
+}
+
+/* Cột Học viên */
+.event-table tbody td:nth-child(2) {
+  font-weight: 700;
+  color: #333;
+}
+
+/* Cột Chuỗi */
+.event-table tbody td:nth-child(4) {
+  font-weight: 900;
+  color: #f59e0b;
+  font-size: 16px;
+}
+
+/* ===== HÀNG TOP 1/2/3 ===== */
+.event-row-top1 td {
+  background: linear-gradient(90deg, #fef9c3, #fef3c7) !important;
+}
+.event-row-top1 td:nth-child(1) {
+  color: #b45309;
+  font-size: 20px;
+}
+.event-row-top2 td {
+  background: #f8fafc !important;
+}
+.event-row-top2 td:nth-child(1) {
+  font-size: 18px;
+}
+.event-row-top3 td {
+  background: #fff7ed !important;
+}
+.event-row-top3 td:nth-child(1) {
+  font-size: 18px;
+}
+
+.event-medal {
+  font-size: 20px;
+}
+
+/* ===== NÚT SỰ KIỆN TRÊN TOOLBAR ===== */
+.event-toggle {
+  position: absolute;
+  top: 12px;
+  right: 150px;   /* Đặt trước nút BXH (đang ở 104px) */
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid #fed7aa;
+  background: #ffffff;
+  color: #f59e0b;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  z-index: 100;
+  padding: 0;
+  line-height: 1;
+  font-family: 'Segoe UI Emoji', 'Apple Color Emoji', sans-serif;
+}
+
+.event-toggle:hover {
+  transform: scale(1.08);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+  border-color: #f59e0b;
+  background: #fffbeb;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+  .event-toggle {
+    width: 32px;
+    height: 32px;
+    font-size: 15px;
+    top: 10px;
+    right: 126px;
+  }
+  
+  .event-header {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+  
+  .event-icon {
+    font-size: 34px;
+  }
+  
+  .event-name {
+    font-size: 16px;
+  }
+  
+  .event-tagline {
+    font-size: 10px;
+  }
+  
+  .event-table {
+    font-size: 12px;
+  }
+  
+  .event-table thead th {
+    padding: 10px 6px;
+    font-size: 11px;
+  }
+  
+  .event-table tbody td {
+    padding: 10px 6px;
+    font-size: 12px;
+  }
+  
+  .event-table tbody td:nth-child(4) {
+    font-size: 14px;
+  }
+}
