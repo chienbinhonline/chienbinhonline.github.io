@@ -29,8 +29,14 @@ function showResult() {
   const isMath = isMathMode(currentMode);
   const isCalculationMode = !isFMFlash && !isSBFlash && !isMath;
   
-  // ⭐ LUÔN lưu lịch sử (cả test mode + luyện tập)
-  // Hàm addHistoryRecord sẽ tự quyết định có gửi Sheet hay không
+  // ⭐ Bỏ qua nếu percent = 0 (không lưu local + không gửi Sheet)
+  if (percent === 0) {
+    console.log('ℹ️ Percent = 0 → không lưu lịch sử');
+    goTo('screen-result');
+    return;
+  }
+  
+  // LUÔN lưu vào local, addHistoryRecord tự quyết định gửi Sheet hay không
   addHistoryRecord({
     mode: currentMode,
     subject: currentMode.startsWith('fm') ? 'fingermath' : 'soroban',
@@ -40,7 +46,7 @@ function showResult() {
     rows: isCalculationMode ? config.terms : 0,
     displayTime: isCalculationMode ? config.timeDisplay : 0,
     date: new Date().toISOString(),
-    isTest: isTestMode === true   // ⭐ Đánh dấu record test
+    isTest: isTestMode === true
   });
   
   goTo('screen-result');
