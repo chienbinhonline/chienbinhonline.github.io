@@ -92,6 +92,26 @@ function updateAppSize(screenId) {
 
 function backToMenu() {
   stopAllTimers();
+
+  const cur = document.querySelector('.screen.active');
+  const curId = cur ? cur.id : '';
+
+  // ⭐ Nếu đang ở màn kết quả → về thẳng menu môn học
+  if (curId === 'screen-result') {
+    const target = (typeof currentMode === 'string' && currentMode.startsWith('fm'))
+      ? 'screen-fingermath'
+      : 'screen-soroban';
+
+    // Reset stack về đúng đường dẫn
+    screenHistory = ['screen-home', target];
+
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    $(target).classList.add('active');
+    updateAppSize(target);
+    return;
+  }
+
+  // Các trường hợp khác → dùng goBack bình thường
   goBack();
 }
 
