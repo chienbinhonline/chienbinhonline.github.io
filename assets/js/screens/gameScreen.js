@@ -175,28 +175,29 @@ function displaySequence(parts) {
   console.log('═══════ START displaySequence ═══════');
   console.log('📝 Parts gốc:', JSON.stringify(parts));
   
-  parts.forEach((tok, i) => {
-    const rawStr = String(tok);
-    const trimmed = rawStr.trim();
-    const isNumber = /^[0-9]+$/.test(trimmed);
-    
-    console.log(`  [${i}] raw="${rawStr}" trim="${trimmed}" isNum=${isNumber}`);
-    
-    if (!isNumber) return;
-    
-    const num = parseInt(trimmed, 10);
-    
-    if (prevNumber === null) {
-      tokenColorMap[i] = 'white';
-    } else if (num === prevNumber) {
-      tokenColorMap[i] = (prevColor === 'white') ? 'red' : 'white';
-    } else {
-      tokenColorMap[i] = 'white';
-    }
-    
-    prevNumber = num;
-    prevColor = tokenColorMap[i];
-  });
+parts.forEach((tok, i) => {
+  const rawStr = String(tok);
+  const trimmed = rawStr.trim();
+  // ⭐ Bắt nhóm số đầu tiên (kể cả khi có dấu + / − phía trước)
+  const match = trimmed.match(/\d+/);
+
+  console.log(`  [${i}] raw="${rawStr}" trim="${trimmed}" match=${match ? match[0] : 'null'}`);
+
+  if (!match) return;
+
+  const num = parseInt(match[0], 10);
+
+  if (prevNumber === null) {
+    tokenColorMap[i] = 'white';
+  } else if (num === prevNumber) {
+    tokenColorMap[i] = (prevColor === 'white') ? 'red' : 'white';
+  } else {
+    tokenColorMap[i] = 'white';
+  }
+
+  prevNumber = num;
+  prevColor = tokenColorMap[i];
+});
   
   console.log('🎨 Màu token FINAL:', JSON.stringify(tokenColorMap));
   console.log('═══════ END displaySequence ═══════');
