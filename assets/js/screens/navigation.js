@@ -62,14 +62,10 @@ function updateAppSize(screenId) {
   const appEl = document.querySelector('.app');
   if (!appEl) return;
   
-  appEl.classList.remove(
-    'app-home', 'app-menu', 'app-config', 'app-game',
-    'app-result', 'app-chart', 'app-leaderboard'
-  );
-     appEl.classList.remove(
-    'app-home', 'app-menu', 'app-config', 'app-game',
-    'app-result', 'app-chart', 'app-leaderboard', 'app-event'
-  );
+ appEl.classList.remove(
+  'app-home', 'app-menu', 'app-config', 'app-game',
+  'app-result', 'app-chart', 'app-leaderboard', 'app-event'
+);
   
   if (screenId === 'screen-home') {
     appEl.classList.add('app-home');
