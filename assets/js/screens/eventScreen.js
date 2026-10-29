@@ -93,8 +93,16 @@ function renderEventTable(list, event) {
     return;
   }
   
-  // Sắp xếp
-  const ranked = list.slice().sort(event.sortFn);
+// ⭐ Lọc theo minDisplay (nếu event khai báo)
+const filtered = list.filter(item => {
+  // Lấy field tương ứng theo cột thứ 4 (cột "value" của event)
+  // Với streak: item.streak
+  if (event.id === 'streak') return (item.streak || 0) >= event.minDisplay;
+  return true;   // event khác → không lọc
+});
+
+// Sắp xếp
+const ranked = filtered.slice().sort(event.sortFn);
   
   // Render
   tbody.innerHTML = ranked.map((item, i) => {
