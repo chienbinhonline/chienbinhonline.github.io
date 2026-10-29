@@ -134,14 +134,15 @@ function syncHistoryFromServer() {
       const local = getHistory();
       const merged = [...local];
       
-      serverHistory.forEach(item => {
-        const exists = merged.some(x => 
-          x.date === item.date && 
-          x.mode === item.mode && 
-          x.score === item.score
-        );
-        if (!exists) merged.push(item);
-      });
+     serverHistory.forEach(item => {
+  const exists = merged.some(x =>
+    x.date === item.date &&
+    x.mode === item.mode &&
+    x.percent === item.percent &&
+    (x.displayTime || 0) === (item.displayTime || 0)
+  );
+  if (!exists) merged.push(item);
+});
       
       saveHistory(merged);
       console.log('✅ Đã đồng bộ. Tổng:', merged.length);
