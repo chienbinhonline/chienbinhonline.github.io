@@ -20,9 +20,12 @@ function renderChart() {
   const canvas = $('chartCanvas');
   if (!canvas) return;
   
-  const container = canvas.parentElement;
-  const W = container.clientWidth - 32;
-  const H = container.clientHeight - 32;
+const container = canvas.parentElement;
+const cs = getComputedStyle(container);
+const padX = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+const padY = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+const W = container.clientWidth - padX;
+const H = container.clientHeight - padY;
   
   const dpr = window.devicePixelRatio || 1;
   canvas.width = W * dpr;
