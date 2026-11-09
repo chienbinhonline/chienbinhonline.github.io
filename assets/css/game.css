@@ -386,28 +386,27 @@
 }
 /* ============================================================
    📱 TỐI ƯU GIAO DIỆN GAME CHO ĐIỆN THOẠI CẦM DỌC (PORTRAIT)
-   Fix lỗi màn hình dọc phải cuộn, bóp méo bàn phím
+   V2.1: Fix lỗi khung câu hỏi bị co rúm lại
    ============================================================ */
 @media (max-width: 800px) and (orientation: portrait) {
   /* 1. Khung App toàn màn hình */
   body { padding: 0; align-items: flex-start; background-color: #f4f6f9; }
   .app.app-game {
-    height: 100dvh; /* Dùng dvh để tự động trừ thanh địa chỉ của trình duyệt */
+    height: 100dvh; 
     max-height: 100dvh;
     border-radius: 0;
     padding: 8px;
-    overflow: hidden; /* Cấm cuộn toàn bộ trang */
+    overflow: hidden; 
     display: flex;
     flex-direction: column;
   }
 
-  /* 2. Ẩn bớt Logo và các nút góc để lấy diện tích */
+  /* 2. Ẩn bớt Logo và thu nhỏ nút góc phải */
   .app.app-game .logo,
   .app.app-game .subtitle {
-    display: none; /* Ẩn logo trên mobile để nhường chỗ cho game */
+    display: none; 
   }
   
-  /* Thu nhỏ các nút chức năng trên góc phải */
   .app.app-game .sound-toggle,
   .app.app-game .leaderboard-toggle,
   .app.app-game .event-toggle,
@@ -424,7 +423,7 @@
   .game-header {
     margin-bottom: 4px;
     gap: 5px;
-    margin-top: 24px; /* Chừa chỗ cho các nút góc phải */
+    margin-top: 24px; 
   }
   .level-tag, .score-inline {
     padding: 4px 8px;
@@ -445,51 +444,72 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    flex: 1; /* Chiếm toàn bộ không gian còn lại */
-    min-height: 0; /* Quan trọng để flexbox không bị tràn */
+    flex: 1; 
+    min-height: 0; 
+    align-items: stretch; /* ⭐ Ép giãn đều 2 khối */
+    width: 100%;
   }
 
-  /* 5. Khung câu hỏi co giãn linh hoạt */
+  /* 5. Khung câu hỏi (FIX LỖI CO RÚM) */
   .game-left {
     flex: 1;
     display: flex;
     flex-direction: column;
     min-height: 0;
+    width: 100%; /* ⭐ Ép rộng 100% */
   }
   .question-box {
     flex: 1;
     min-height: 120px;
     padding: 10px;
     border-radius: 12px;
+    width: 100%; /* ⭐ Ép rộng 100% */
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .main-display {
-    font-size: 70px; /* Thu nhỏ số lại cho vừa khung */
+    font-size: 70px; 
     min-height: auto;
     letter-spacing: 2px;
+    width: 100%; /* ⭐ Ép rộng 100% */
+    text-align: center;
+    justify-content: center;
   }
+  
+  /* Nút hiện phép tính cũ */
   .past-wrapper {
     margin-top: 4px;
+    width: 100%;
   }
   .past-display {
     padding: 4px 10px;
     font-size: 13px;
+    width: 100%;
+    box-sizing: border-box;
   }
 
-  /* 6. Khu vực nhập đáp án & Bàn phím (Cố định chiều cao dưới đáy) */
+  /* 6. Khu vực nhập đáp án & Bàn phím */
   .game-right {
-    flex-shrink: 0; /* Không cho co lại, luôn nằm dưới cùng */
+    flex-shrink: 0; 
     gap: 6px;
+    width: 100%; /* ⭐ Ép rộng 100% */
   }
   .answer-input {
     padding: 8px;
     font-size: 20px;
     height: 42px;
     border-width: 2px;
+    width: 100%;
+    box-sizing: border-box;
   }
   .numpad {
     padding: 6px;
     gap: 6px;
     border-radius: 12px;
+    width: 100%; /* ⭐ Ép rộng 100% */
+    box-sizing: border-box;
   }
   .numpad-btn {
     padding: 10px 0;
@@ -498,6 +518,7 @@
   }
   .buttons {
     gap: 6px;
+    width: 100%;
   }
   .btn {
     padding: 10px;
