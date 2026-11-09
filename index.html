@@ -16,19 +16,19 @@
 </head>
 <body>
 
-<!-- ============ OVERLAY ĐĂNG NHẬP (1 Ô — MÃ HỌC VIÊN) ============ -->
+<!-- ============ OVERLAY ĐĂNG NHẬP ============ -->
 <div class="name-overlay" id="nameOverlay">
   <div class="name-modal">
     <h2>Chào mừng đến SUPERBRAIN!</h2>
     <p>Cú pháp đăng nhập</p>
     
     <p style="font-size:12px; color:#888; margin-bottom:16px; text-align:center;">
-      VD: Huỳnh Tấn Đạt - 18/12/2018 → htd18122018
+      HV: htd18122018 | GV: gv_covan
     </p>
     
     <div class="name-field">
-      <label for="studentPhoneInput">Nhập tên đăng nhập</label>
-      <input type="text" id="studentPhoneInput" placeholder="htd18122018" 
+      <label for="studentPhoneInput">Mã đăng nhập</label>
+      <input type="text" id="studentPhoneInput" placeholder="Nhập mã..." 
              maxlength="30" autocomplete="off" 
              autocapitalize="off" autocorrect="off" spellcheck="false">
     </div>
@@ -41,8 +41,8 @@
 
 <div class="app">
   <button class="sound-toggle" id="soundToggle" onclick="toggleSound()" title="Bật/tắt âm thanh">🔊</button>
- <button class="event-toggle" id="eventToggle" title="Sự kiện">🔥</button>
-<button class="leaderboard-toggle" id="leaderboardToggle" title="Bảng xếp hạng">🏆</button>
+  <button class="event-toggle" id="eventToggle" title="Sự kiện">🔥</button>
+  <button class="leaderboard-toggle" id="leaderboardToggle" title="Bảng xếp hạng">🏆</button>
   <button class="logout-toggle" id="logoutToggle" onclick="confirmLogout()" title="Thoát">🚪</button>
 
   <div class="logo">
@@ -89,6 +89,18 @@
           </div>
         </div>
         <div class="menu-arrow">›</div>
+      </button>
+
+      <!-- ⭐ NÚT BÁO CÁO DÀNH CHO GIÁO VIÊN -->
+      <button class="menu-card" id="reportMenuCard" onclick="showReportScreen()" style="display: none; background: linear-gradient(135deg, #eff6ff, #dbeafe); border-color: #93c5fd;">
+        <div class="menu-card-main">
+          <div class="menu-icon" style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; font-size: 24px;">📋</div>
+          <div>
+            <div class="menu-text">Báo cáo lớp học</div>
+            <div class="menu-desc">Quản lý học viên (Dành cho GV)</div>
+          </div>
+        </div>
+        <div class="menu-arrow" style="color: #2563eb;">›</div>
       </button>
     </div>
     <div class="footer-credit">JGNOT</div>
@@ -299,7 +311,7 @@
       
       <div class="game-right">
         <input type="text" class="answer-input" id="answer" placeholder="Nhập đáp án..." 
-               autocomplete="off" inputmode="none" disabled>
+               autocomplete="off" inputmode="none"disabled>
         
         <div class="numpad" id="numpad">
           <button type="button" class="numpad-btn" data-num="1">1</button>
@@ -324,13 +336,13 @@
       </div>
     </div>
   </div>
+
   <!-- ============ SỰ KIỆN ============ -->
   <div class="screen" id="screen-event">
     <div class="chart-header">
       <button class="back-btn" onclick="goBack()">‹ Trở về</button>
       <button class="close-btn" onclick="goBack()" style="margin-left: auto;">✕</button>
     </div>
-    
     <div class="event-header" id="eventHeader">
       <div class="event-icon" id="eventIcon">🔥</div>
       <div class="event-title-group">
@@ -338,9 +350,7 @@
         <div class="event-tagline" id="eventTagline">Luyện tập mỗi ngày - Xây chuỗi bất tận</div>
       </div>
     </div>
-    
     <p class="chart-subtitle" id="eventSubtitle">Đang tải...</p>
-    
     <div class="event-scroll">
       <table class="event-table">
         <thead>
@@ -356,21 +366,19 @@
         </tbody>
       </table>
     </div>
-    
     <div class="chart-actions">
       <button class="btn-yellow" onclick="showEvent()">🔄 LÀM MỚI</button>
     </div>
   </div>
+
   <!-- ============ BXH ============ -->
   <div class="screen" id="screen-leaderboard">
     <div class="chart-header">
       <button class="back-btn" onclick="goBack()">‹ Trở về</button>
       <button class="close-btn" onclick="goBack()" style="margin-left: auto;">✕</button>
     </div>
-    
     <h2 class="chart-title">🏆 Bảng xếp hạng</h2>
     <p class="chart-subtitle" id="lbSubtitle">Top 10 học viên có tốc độ cao nhất</p>
-    
     <div class="lb-scroll">
       <table class="lb-table">
         <thead>
@@ -389,7 +397,6 @@
         </tbody>
       </table>
     </div>
-    
     <div class="chart-actions">
       <button class="btn-yellow" onclick="showLeaderboard()">🔄 LÀM MỚI</button>
     </div>
@@ -401,18 +408,14 @@
       <button class="back-btn" onclick="goBack()">‹ Trở về</button>
       <button class="close-btn" onclick="goBack()" style="margin-left: auto;">✕</button>
     </div>
-    
     <h2 class="chart-title">Kết quả</h2>
     <p class="chart-subtitle" id="chartSubtitle">Kết quả bài tập cho học viên</p>
-    
     <div class="chart-legend" id="chartLegend"></div>
-    
     <div class="chart-container">
       <canvas id="chartCanvas"></canvas>
     </div>
-    
     <div class="chart-actions">
-      <button class="btn-yellow" onclick="goTo('screen-home')">BÀI TẬP</button>
+      <button class="btn-yellow" onclick="goBack()">QUAY LẠI</button>
     </div>
   </div>
 
@@ -447,6 +450,31 @@
     </div>
   </div>
 
+  <!-- ============ MÀN HÌNH BÁO CÁO GIÁO VIÊN ⭐ ============ -->
+  <div class="screen" id="screen-report">
+    <div class="chart-header">
+      <button class="back-btn" onclick="goBack()">‹ Trở về</button>
+      <button class="close-btn" onclick="goBack()" style="margin-left: auto;">✕</button>
+    </div>
+    <h2 class="chart-title">📋 Báo cáo lớp học</h2>
+    <p class="chart-subtitle" id="reportSubtitle">Đang tải...</p>
+    <div class="lb-scroll">
+      <table class="lb-table">
+        <thead>
+          <tr>
+            <th>STT</th>
+            <th>Họ tên</th>
+            <th>Mã HV (SĐT)</th>
+            <th style="text-align: center;">Thao tác</th>
+          </tr>
+        </thead>
+        <tbody id="reportBody">
+          <tr><td colspan="4" style="text-align:center;padding:24px;">Đang tải...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
 </div>
 
 <!-- JS -->
@@ -468,6 +496,7 @@
 <script src="assets/js/screens/chartScreen.js"></script>
 <script src="assets/js/screens/leaderboardScreen.js"></script>
 <script src="assets/js/screens/eventScreen.js"></script>
+<script src="assets/js/screens/reportScreen.js"></script> <!-- ⭐ IMPORT FILE MỚI -->
 
 <script src="assets/js/app.js"></script>
 
