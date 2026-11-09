@@ -475,3 +475,4 @@ body {
   .lb-table tbody td { padding: 8px 6px; font-size: 12px; }
   .lb-table tbody td:nth-child(4) { font-size: 11px; }
 }
+.app.app-report { max-width: 1000px; padding: 20px 28px; }
