@@ -1,5 +1,6 @@
-﻿/* ============================================================
+/* ============================================================
    CONFIG CSS — Landscape, 2 cột
+   V2.1: Fix lỗi tràn màn hình trên điện thoại dọc
    ============================================================ */
 
 .config-screen {
@@ -64,7 +65,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  flex-wrap: nowrap;
+  flex-wrap: nowrap; /* Sẽ được ghi đè ở mobile */
 }
 .config-label {
   font-size: 12px;
@@ -76,7 +77,7 @@
 .digit-btns, .time-btns {
   display: flex;
   gap: 4px;
-  flex-wrap: nowrap;
+  flex-wrap: nowrap; /* Sẽ được ghi đè ở mobile */
   justify-content: center;
 }
 .digit-btn, .time-btn {
@@ -165,13 +166,99 @@
 .btn-yellow:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.3); }
 .btn-yellow:active { transform: translateY(0); }
 
-@media (max-width: 700px) {
-  .config-grid { grid-template-columns: 1fr; }
-  .config-title { font-size: 20px; margin-bottom: 10px; }
-  .config-screen { padding: 14px; }
-  .digit-btn, .time-btn { min-width: 28px; height: 28px; font-size: 11px; }
-  .time-btn { min-width: 34px; padding: 0 6px; }
-  .term-input { width: 42px; height: 28px; font-size: 12px; }
-  .config-label { font-size: 11px; }
-  .btn-yellow { padding: 10px; font-size: 13px; }
+/* ============================================================
+   📱 TỐI ƯU GIAO DIỆN CẤU HÌNH CHO ĐIỆN THOẠI (PORTRAIT)
+   ============================================================ */
+@media (max-width: 768px) {
+  .config-screen { 
+    padding: 12px; 
+    border-radius: 12px;
+  }
+  .config-grid { 
+    grid-template-columns: 1fr; /* Ép thành 1 cột dọc */
+    gap: 12px; 
+  }
+  .config-title { 
+    font-size: 20px; 
+    margin-bottom: 8px; 
+  }
+  .config-section {
+    padding: 10px 12px;
+  }
+  .config-section-title {
+    font-size: 11px;
+    margin-top: -18px;
+    padding: 0 8px;
+  }
+
+  /* ⭐ QUAN TRỌNG: Cho phép rớt dòng thay vì tràn màn hình */
+  .config-row {
+    flex-wrap: wrap; 
+    gap: 8px;
+    justify-content: center;
+  }
+  
+  .config-label {
+    font-size: 12px;
+  }
+
+  /* Hàng nút chữ số (1-8) tự động rớt dòng nếu thiếu chỗ */
+  .digit-btns {
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%; /* Chiếm toàn bộ chiều rộng để dàn đều */
+  }
+  .digit-btn {
+    min-width: 32px;
+    height: 32px;
+    font-size: 13px;
+    flex: 1; /* Tự động giãn đều các nút */
+    max-width: 45px; /* Không cho nút phình to quá mức */
+  }
+
+  /* Nút thời gian tự động giãn đều */
+  .time-btns {
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+  }
+  .time-btn {
+    min-width: 45px;
+    height: 32px;
+    font-size: 13px;
+    flex: 1;
+  }
+
+  /* Ô nhập số hàng */
+  .term-input {
+    width: 50px;
+    height: 32px;
+    font-size: 14px;
+    margin-left: 4px;
+  }
+
+  /* Phần cấu hình Nhân/Chia */
+  .math-config-row {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .math-config-row .digit-btn {
+    min-width: 30px;
+    height: 30px;
+    font-size: 12px;
+  }
+  .math-symbol {
+    font-size: 18px;
+  }
+
+  /* Nút Làm thử / Lưu */
+  .config-actions {
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .btn-yellow {
+    padding: 12px;
+    font-size: 14px;
+    border-radius: 16px;
+  }
 }
