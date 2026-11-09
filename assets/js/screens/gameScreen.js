@@ -1,11 +1,29 @@
 /* ============================================================
    GAME SCREEN — Xử lý màn hình chơi
-   V2.6: Fix màu đỏ cho số giống liền trước + log verify
+   V2.8: Chống chạy ngầm khi chuyển màn hình (Zombie Timers)
    ============================================================ */
+
+// ⭐ BIẾN TOÀN CỤC CHỐNG LỖI (RACE CONDITION)
+let isAnswerLocked = false;
+let gameTimeouts = [];
+
+// ⭐ Hàm dọn dẹp tất cả setTimeout ngầm
+function clearGameTimeouts() {
+  gameTimeouts.forEach(t => clearTimeout(t));
+  gameTimeouts = [];
+}
+
+// ⭐ Hàm kiểm tra xem có đang ở màn hình game không
+function isGameActive() {
+  const screen = $('screen-game');
+  return screen && screen.classList.contains('active');
+}
 
 /* ============ CHUẨN BỊ CÂU ĐẦU ============ */
 function prepareFirstQuestion() {
   waitingStart = true;
+  clearGameTimeouts();
+  isAnswerLocked = false;
   
   const qBox = $('questionBox');
   qBox.classList.remove('flashcard', 'soroban-flash', 'answer-reveal');
@@ -60,6 +78,11 @@ function buildReviewQueue() {
 
 /* ============ CÂU TIẾP ============ */
 function nextQuestion() {
+  // ⭐ TRẠM GÁC: Nếu đã thoát khỏi màn hình chơi thì dừng ngay lập tức
+  if (!isGameActive()) return; 
+  
+  clearGameTimeouts();
+  isAnswerLocked = false;
   hideAnswerOverlay();
   
   if (currentQuestionIndex >= totalQuestions) { 
@@ -116,7 +139,9 @@ function nextQuestion() {
   
   if (isMathMode(currentMode)) {
     showLoading();
-    setTimeout(() => {
+    let t = setTimeout(() => {
+      if (!isGameActive()) return; // ⭐ Chống chạy ngầm
+      
       let q;
       if (currentMode === 'sb-mul') {
         q = genMulQuestion(config.mathDigit1, config.mathDigit2);
@@ -129,11 +154,14 @@ function nextQuestion() {
       hideLoading();
       displaySequence(currentParts);
     }, 50);
+    gameTimeouts.push(t);
     return;
   }
   
   showLoading();
-  setTimeout(() => {
+  let t = setTimeout(() => {
+    if (!isGameActive()) return; // ⭐ Chống chạy ngầm
+    
     const q = generateOneQuestion(modeKey, config.digits, config.terms, RULES);
     currentParts = q.parts;
     currentAnswer = q.answer;
@@ -142,15 +170,11 @@ function nextQuestion() {
     hideLoading();
     displaySequence(currentParts);
   }, 50);
+  gameTimeouts.push(t);
 }
 
 /* ============================================================
    HIỂN THỊ TUẦN TỰ
-   ⭐ Quy tắc màu:
-   - Số đầu tiên: TRẮNG
-   - Số sau:
-     + Nếu GIỐNG số liền trước → ĐỔI MÀU so với số trước
-     + Nếu KHÁC số liền trước → TRẮNG
    ============================================================ */
 function displaySequence(parts) {
   const mainEl = $('mainDisplay');
@@ -162,49 +186,33 @@ function displaySequence(parts) {
   
   const total = config.timeDisplay;
   const stepTime = (total * 1000) / parts.length;
-  const PAUSE_AFTER_LAST = 3000;
+  const PAUSE_AFTER_LAST = 500; // 0.5s như bạn đã sửa
   
-  // ============================================================
-  // ⭐ BƯỚC 1: TÍNH MÀU CHO TỪNG SỐ (bỏ qua dấu)
-  // ============================================================
   const tokenColorMap = {};
   let prevNumber = null;
   let prevColor = 'white';
   
-  // LOG: bắt đầu
-  console.log('═══════ START displaySequence ═══════');
-  console.log('📝 Parts gốc:', JSON.stringify(parts));
+  parts.forEach((tok, i) => {
+    const rawStr = String(tok);
+    const trimmed = rawStr.trim();
+    const match = trimmed.match(/\d+/);
   
-parts.forEach((tok, i) => {
-  const rawStr = String(tok);
-  const trimmed = rawStr.trim();
-  // ⭐ Bắt nhóm số đầu tiên (kể cả khi có dấu + / − phía trước)
-  const match = trimmed.match(/\d+/);
-
-  console.log(`  [${i}] raw="${rawStr}" trim="${trimmed}" match=${match ? match[0] : 'null'}`);
-
-  if (!match) return;
-
-  const num = parseInt(match[0], 10);
-
-  if (prevNumber === null) {
-    tokenColorMap[i] = 'white';
-  } else if (num === prevNumber) {
-    tokenColorMap[i] = (prevColor === 'white') ? 'red' : 'white';
-  } else {
-    tokenColorMap[i] = 'white';
-  }
-
-  prevNumber = num;
-  prevColor = tokenColorMap[i];
-});
+    if (!match) return;
   
-  console.log('🎨 Màu token FINAL:', JSON.stringify(tokenColorMap));
-  console.log('═══════ END displaySequence ═══════');
+    const num = parseInt(match[0], 10);
   
-  // ============================================================
-  // ⭐ BƯỚC 2: RENDER
-  // ============================================================
+    if (prevNumber === null) {
+      tokenColorMap[i] = 'white';
+    } else if (num === prevNumber) {
+      tokenColorMap[i] = (prevColor === 'white') ? 'red' : 'white';
+    } else {
+      tokenColorMap[i] = 'white';
+    }
+  
+    prevNumber = num;
+    prevColor = tokenColorMap[i];
+  });
+  
   function tokenHTML(text, idx) {
     const color = tokenColorMap[idx];
     if (color === 'red') {
@@ -228,6 +236,12 @@ parts.forEach((tok, i) => {
   $('timerFill').style.width = '100%';
   
   displayTimer = setInterval(() => {
+    // ⭐ TRẠM GÁC TRONG VÒNG LẶP
+    if (!isGameActive()) {
+      clearInterval(displayTimer);
+      return;
+    }
+
     elapsed += 50;
     const remain = Math.max(0, total * 1000 - elapsed);
     $('timerFill').style.width = (remain / (total * 1000) * 100) + '%';
@@ -257,50 +271,68 @@ parts.forEach((tok, i) => {
       
       mainEl.innerHTML = '';
       
-      setTimeout(() => {
+      let t = setTimeout(() => {
+        if (!isGameActive()) return; // ⭐ Chống chạy ngầm
         mainEl.innerHTML = `<span class="token">=</span>`;
         startAnswerPhase();
       }, PAUSE_AFTER_LAST);
+      gameTimeouts.push(t);
     }
   }, 50);
 }
 
 /* ============ NHẬP ĐÁP ÁN ============ */
 function startAnswerPhase() {
+  if (!isGameActive()) return; // ⭐ Chống chạy ngầm
+  
   answerPhase = true;
+  isAnswerLocked = false; 
   
   $('answer').disabled = false;
   $('btnCheck').disabled = false;
   $('timerBar').classList.add('flash');
   
-  setTimeout(() => {
-    const input = $('answer');
-    if (input && !input.disabled) {
-      input.focus();
-      if (input.setSelectionRange) {
-        const len = input.value.length;
-        input.setSelectionRange(len, len);
-      }
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  const input = $('answer');
+  
+  if (input) {
+    if (isMobile) {
+      input.setAttribute('readonly', 'readonly');
+      input.blur(); 
+    } else {
+      input.removeAttribute('readonly');
+      let t = setTimeout(() => {
+        if (isGameActive() && !input.disabled) {
+          input.focus();
+          const len = input.value.length;
+          if(input.setSelectionRange) input.setSelectionRange(len, len);
+        }
+      }, 50);
+      gameTimeouts.push(t);
     }
-  }, 50);
+  }
   
   let answerTimeLeft = config.timeAnswer;
   $('timerFill').style.width = '100%';
   
   answerTimer = setInterval(() => {
+    // ⭐ TRẠM GÁC TRONG VÒNG LẶP
+    if (!isGameActive()) {
+      clearInterval(answerTimer);
+      return;
+    }
+
     answerTimeLeft--;
     $('timerFill').style.width = (answerTimeLeft / config.timeAnswer * 100) + '%';
     if (answerTimeLeft <= 0) {
       clearInterval(answerTimer);
       answerTimer = null;
-      recordWrong('⏰ Hết thời gian!');
+      submitAnswer(true); 
     }
   }, 1000);
 }
 
-/* ============================================================
-   CHUYỂN NỀN SANG TRẮNG KHI TRẢ LỜI
-   ============================================================ */
+/* ============================================================ */
 function revealAnswerBackground() {
   const qBox = $('questionBox');
   const mainEl = $('mainDisplay');
@@ -314,28 +346,35 @@ function resetAnswerBackground() {
 }
 
 /* ============================================================
-   CHECK ĐÁP ÁN
+   HÀM XỬ LÝ NỘP BÀI (DÙNG CHUNG CHO CẢ BẤM NÚT VÀ HẾT GIỜ)
    ============================================================ */
-function checkAnswer() {
-  if (!answerPhase) return;
-  
-  const raw = $('answer').value.trim();
-  const userAns = parseInt(raw);
-  
-  if (raw === '' || isNaN(userAns)) {
-    $('feedback').textContent = '⚠️ Vui lòng nhập đáp án!';
-    $('feedback').className = 'feedback wrong';
-    return;
-  }
+function submitAnswer(isTimeout = false) {
+  if (isAnswerLocked) return; 
+  isAnswerLocked = true;      
   
   stopAllTimers();
-  userAnswer = raw;
+  
+  const raw = $('answer').value.trim();
+  let userAns = parseInt(raw);
+  
+  if (isTimeout && (raw === '' || isNaN(userAns))) {
+     userAns = NaN; 
+     userAnswer = ''; 
+  } else if (!isTimeout && (raw === '' || isNaN(userAns))) {
+     $('feedback').textContent = '⚠️ Vui lòng nhập đáp án!';
+     $('feedback').className = 'feedback wrong';
+     isAnswerLocked = false; 
+     return;
+  } else {
+     userAnswer = raw;
+  }
   
   const isCorrect = (userAns === currentAnswer);
   
   revealAnswerBackground();
   
-  setTimeout(() => {
+  let t1 = setTimeout(() => {
+    if (!isGameActive()) return;
     if (isCorrect) {
       playSound('ok');
       showAnswerOverlay(true);
@@ -344,6 +383,7 @@ function checkAnswer() {
       showAnswerOverlay(false);
     }
   }, 300);
+  gameTimeouts.push(t1);
   
   if (isCorrect) {
     score++; 
@@ -363,12 +403,18 @@ function checkAnswer() {
     wrong++; 
     streak = 0;
     $('streak').textContent = 0;
-    $('feedback').textContent = `❌ Sai! Đáp án đúng: ${currentAnswer}`;
+    
+    if (isTimeout && raw === '') {
+      $('feedback').textContent = `⏰ Hết thời gian! Đáp án: ${currentAnswer}`;
+    } else {
+      $('feedback').textContent = `❌ Sai! Đáp án đúng: ${currentAnswer}`;
+    }
+    
     $('feedback').className = 'feedback wrong';
     
     history.push({
       question: currentQuestionText,
-      answer: userAnswer === '' ? '—' : userAnswer,
+      answer: (raw === '') ? '—' : raw,
       correct: currentAnswer,
       isCorrect: false
     });
@@ -376,50 +422,66 @@ function checkAnswer() {
     userAnswer = '';
   }
   
-  setTimeout(() => {
+  let t2 = setTimeout(() => {
+    if (!isGameActive()) return;
     hideAnswerOverlay();
     resetAnswerBackground();
   }, 3300);
+  gameTimeouts.push(t2);
   
-  setTimeout(() => {
+  let t3 = setTimeout(() => {
+    if (!isGameActive()) return; // ⭐ Chống chạy ngầm khi chuyển câu
     nextQuestion();
   }, 5300);
+  gameTimeouts.push(t3);
 }
 
-/* ============ XỬ LÝ SAI ============ */
-function recordWrong(msg) {
-  stopAllTimers();
+function checkAnswer() {
+  submitAnswer(false);
+}
+
+/* ============ XỬ LÝ BỎ QUA (SKIP) ============ */
+function skipAnswer() {
+  if (isAnswerLocked) return;
+  isAnswerLocked = true;
   
+  stopAllTimers();
   revealAnswerBackground();
   
-  setTimeout(() => {
+  let t1 = setTimeout(() => {
+    if (!isGameActive()) return;
     playSound('fail');
     showAnswerOverlay(false);
   }, 300);
+  gameTimeouts.push(t1);
   
   wrong++; 
   streak = 0;
   $('streak').textContent = 0;
-  $('feedback').textContent = msg;
+  $('feedback').textContent = `⏭️ Bỏ qua. Đáp án: ${currentAnswer}`;
   $('feedback').className = 'feedback wrong';
   
   history.push({
     question: currentQuestionText,
-    answer: userAnswer === '' ? '—' : userAnswer,
+    answer: '—',
     correct: currentAnswer,
     isCorrect: false
   });
   
   userAnswer = '';
   
-  setTimeout(() => {
+  let t2 = setTimeout(() => {
+    if (!isGameActive()) return;
     hideAnswerOverlay();
     resetAnswerBackground();
   }, 3300);
+  gameTimeouts.push(t2);
   
-  setTimeout(() => {
+  let t3 = setTimeout(() => {
+    if (!isGameActive()) return; // ⭐ Chống chạy ngầm khi chuyển câu
     nextQuestion();
   }, 5300);
+  gameTimeouts.push(t3);
 }
 
 /* ============ OVERLAY ============ */
@@ -435,11 +497,6 @@ function showAnswerOverlay(isCorrect) {
   overlay.classList.remove('show');
   void overlay.offsetWidth;
   overlay.classList.add('show');
-  
-  clearTimeout(overlayTimer);
-  overlayTimer = setTimeout(() => {
-    overlay.classList.remove('show');
-  }, 3000);
 }
 
 function hideAnswerOverlay() {
