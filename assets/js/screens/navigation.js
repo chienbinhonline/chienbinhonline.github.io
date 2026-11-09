@@ -1,43 +1,38 @@
 /* ============================================================
    NAVIGATION — Chuyển màn hình + đổi kích thước app
-   V2.3: Fix goBack() để xử lý đúng khi history lệch
+   V2.4: Fix lỗi chạy ngầm khi thoát game giữa chừng
    ============================================================ */
 
-/* ============ HISTORY STACK ============ */
 let screenHistory = ['screen-home'];
 
 function goTo(screenId) {
+  // ⭐ CẦU DAO ĐIỆN: Cứ chuyển màn hình là ngắt toàn bộ timer ngầm
+  if (typeof stopAllTimers === 'function') stopAllTimers();
+
   const currentActive = document.querySelector('.screen.active');
   const currentId = currentActive ? currentActive.id : '';
   
-  // Chỉ push vào history nếu KHÁC màn hình hiện tại
   if (currentId && currentId !== screenId) {
     if (screenHistory[screenHistory.length - 1] !== currentId) {
       screenHistory.push(currentId);
     }
   }
   
-  // Đổi màn hình
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   $(screenId).classList.add('active');
   updateAppSize(screenId);
 }
 
-/* ⭐ HÀM goBack() ĐÃ SỬA */
 function goBack() {
-  // Dừng timer nếu đang chơi
   if (typeof stopAllTimers === 'function') stopAllTimers();
   
-  // ⭐ Lấy màn hình đang active hiện tại
   const currentActive = document.querySelector('.screen.active');
   const currentId = currentActive ? currentActive.id : '';
   
-  // ⭐ Nếu màn hình hiện tại CHƯA có trong history → thêm vào
   if (currentId && screenHistory[screenHistory.length - 1] !== currentId) {
     screenHistory.push(currentId);
   }
   
-  // ⭐ Nếu history chỉ có 1 phần tử → về home
   if (screenHistory.length <= 1) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     $('screen-home').classList.add('active');
@@ -46,13 +41,8 @@ function goBack() {
     return;
   }
   
-  // ⭐ Bỏ màn hình hiện tại
   screenHistory.pop();
-  
-  // Lấy màn hình trước đó
   const prevScreen = screenHistory[screenHistory.length - 1] || 'screen-home';
-  
-  // Đổi màn hình
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   $(prevScreen).classList.add('active');
   updateAppSize(prevScreen);
@@ -62,10 +52,7 @@ function updateAppSize(screenId) {
   const appEl = document.querySelector('.app');
   if (!appEl) return;
   
- appEl.classList.remove(
-  'app-home', 'app-menu', 'app-config', 'app-game',
-  'app-result', 'app-chart', 'app-leaderboard', 'app-event'
-);
+  appEl.classList.remove('app-home', 'app-menu', 'app-config', 'app-game', 'app-result', 'app-chart', 'app-leaderboard', 'app-event', 'app-report');
   
   if (screenId === 'screen-home') {
     appEl.classList.add('app-home');
@@ -83,37 +70,28 @@ function updateAppSize(screenId) {
     appEl.classList.add('app-leaderboard');
   } else if (screenId === 'screen-event') {
     appEl.classList.add('app-event');
+  } else if (screenId === 'screen-report') {
+    appEl.classList.add('app-report');
   }
 }
 
 function backToMenu() {
   stopAllTimers();
-
   const cur = document.querySelector('.screen.active');
   const curId = cur ? cur.id : '';
 
-  // ⭐ Nếu đang ở màn kết quả → về thẳng menu môn học
   if (curId === 'screen-result') {
-    const target = (typeof currentMode === 'string' && currentMode.startsWith('fm'))
-      ? 'screen-fingermath'
-      : 'screen-soroban';
-
-    // Reset stack về đúng đường dẫn
+    const target = (typeof currentMode === 'string' && currentMode.startsWith('fm')) ? 'screen-fingermath' : 'screen-soroban';
     screenHistory = ['screen-home', target];
-
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     $(target).classList.add('active');
     updateAppSize(target);
     return;
   }
-
-  // Các trường hợp khác → dùng goBack bình thường
   goBack();
 }
 
-function backFromConfig() {
-  goBack();
-}
+function backFromConfig() { goBack(); }
 
 function togglePastBox() {
   const box = $('pastDisplay');
@@ -123,18 +101,23 @@ function togglePastBox() {
   btn.textContent = box.classList.contains('show') ? 'ẨN' : 'HIỆN';
 }
 
-function showLoading() {
-  $('mainDisplay').style.display = 'none';
-  $('loadingSpinner').classList.add('show');
-}
+function showLoading() { $('mainDisplay').style.display = 'none'; $('loadingSpinner').classList.add('show'); }
+function hideLoading() { $('mainDisplay').style.display = 'flex'; $('loadingSpinner').classList.remove('show'); }
 
-function hideLoading() {
-  $('mainDisplay').style.display = 'flex';
-  $('loadingSpinner').classList.remove('show');
-}
-
+// ⭐ HÀM DỌN DẸP TOÀN BỘ TIMER (Cả Interval lẫn Timeout ngầm)
 function stopAllTimers() {
-  if (displayTimer) { clearInterval(displayTimer); displayTimer = null; }
-  if (answerTimer) { clearInterval(answerTimer); answerTimer = null; }
-  answerPhase = false;
+  if (typeof displayTimer !== 'undefined' && displayTimer) { clearInterval(displayTimer); displayTimer = null; }
+  if (typeof answerTimer !== 'undefined' && answerTimer) { clearInterval(answerTimer); answerTimer = null; }
+  
+  // Dọn dẹp các setTimeout ngầm trong game
+  if (typeof clearGameTimeouts === 'function') {
+    clearGameTimeouts();
+  }
+  
+  if (typeof answerPhase !== 'undefined') answerPhase = false;
+  
+  // Khóa nộp bài để không bị click nhầm khi đang chuyển cảnh
+  if (typeof isAnswerLocked !== 'undefined') {
+    isAnswerLocked = true; 
+  }
 }
