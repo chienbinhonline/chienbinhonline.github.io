@@ -384,3 +384,138 @@
   .btn-start { padding: 12px 26px; font-size: 16px; }
   .answer-overlay img { width: 130px; height: 130px; }
 }
+/* ============================================================
+   📱 TỐI ƯU GIAO DIỆN GAME CHO ĐIỆN THOẠI CẦM DỌC (PORTRAIT)
+   Fix lỗi màn hình dọc phải cuộn, bóp méo bàn phím
+   ============================================================ */
+@media (max-width: 800px) and (orientation: portrait) {
+  /* 1. Khung App toàn màn hình */
+  body { padding: 0; align-items: flex-start; background-color: #f4f6f9; }
+  .app.app-game {
+    height: 100dvh; /* Dùng dvh để tự động trừ thanh địa chỉ của trình duyệt */
+    max-height: 100dvh;
+    border-radius: 0;
+    padding: 8px;
+    overflow: hidden; /* Cấm cuộn toàn bộ trang */
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* 2. Ẩn bớt Logo và các nút góc để lấy diện tích */
+  .app.app-game .logo,
+  .app.app-game .subtitle {
+    display: none; /* Ẩn logo trên mobile để nhường chỗ cho game */
+  }
+  
+  /* Thu nhỏ các nút chức năng trên góc phải */
+  .app.app-game .sound-toggle,
+  .app.app-game .leaderboard-toggle,
+  .app.app-game .event-toggle,
+  .app.app-game .logout-toggle {
+    top: 6px;
+    width: 30px; height: 30px; font-size: 14px;
+  }
+  .app.app-game .sound-toggle { right: 6px; }
+  .app.app-game .logout-toggle { right: 40px; }
+  .app.app-game .leaderboard-toggle { right: 74px; }
+  .app.app-game .event-toggle { right: 108px; }
+
+  /* 3. Header Game gọn lại */
+  .game-header {
+    margin-bottom: 4px;
+    gap: 5px;
+    margin-top: 24px; /* Chừa chỗ cho các nút góc phải */
+  }
+  .level-tag, .score-inline {
+    padding: 4px 8px;
+    font-size: 11px;
+    border-radius: 10px;
+  }
+  .progress-info {
+    font-size: 12px;
+    margin-bottom: 4px;
+  }
+  .timer-bar {
+    margin-bottom: 6px;
+    height: 6px;
+  }
+
+  /* 4. Bố cục Body Game xếp dọc */
+  .game-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1; /* Chiếm toàn bộ không gian còn lại */
+    min-height: 0; /* Quan trọng để flexbox không bị tràn */
+  }
+
+  /* 5. Khung câu hỏi co giãn linh hoạt */
+  .game-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .question-box {
+    flex: 1;
+    min-height: 120px;
+    padding: 10px;
+    border-radius: 12px;
+  }
+  .main-display {
+    font-size: 70px; /* Thu nhỏ số lại cho vừa khung */
+    min-height: auto;
+    letter-spacing: 2px;
+  }
+  .past-wrapper {
+    margin-top: 4px;
+  }
+  .past-display {
+    padding: 4px 10px;
+    font-size: 13px;
+  }
+
+  /* 6. Khu vực nhập đáp án & Bàn phím (Cố định chiều cao dưới đáy) */
+  .game-right {
+    flex-shrink: 0; /* Không cho co lại, luôn nằm dưới cùng */
+    gap: 6px;
+  }
+  .answer-input {
+    padding: 8px;
+    font-size: 20px;
+    height: 42px;
+    border-width: 2px;
+  }
+  .numpad {
+    padding: 6px;
+    gap: 6px;
+    border-radius: 12px;
+  }
+  .numpad-btn {
+    padding: 10px 0;
+    font-size: 18px;
+    border-radius: 8px;
+  }
+  .buttons {
+    gap: 6px;
+  }
+  .btn {
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 10px;
+  }
+  .feedback {
+    font-size: 13px;
+    min-height: 18px;
+  }
+
+  /* 7. Overlay & Bắt đầu */
+  .start-overlay {
+    border-radius: 12px;
+    gap: 15px;
+  }
+  .start-title { font-size: 20px; }
+  .btn-start { padding: 12px 30px; font-size: 18px; }
+  .loading-spinner { transform: scale(0.8); }
+  .answer-overlay img { width: 130px; height: 130px; }
+}
